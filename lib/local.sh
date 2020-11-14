@@ -13,7 +13,7 @@ provision() {
   SERVER_HOSTNAME=$(basename $SERVER_PROVISION_FILE | rev | cut -d "." -f2- | rev)
   rsync $SSH_OUTPUT_FLAG -ac $SCRIPT_ROOT/lib/remote.sh -e "ssh -q" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT/lib/remote.sh
   rsync $SSH_OUTPUT_FLAG -Rac $SERVER_PROVISION_FILE $(grep -w "apply" $SERVER_PROVISION_FILE | cut -d " " -f 2) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT
-  ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" "export SERVER_HOSTNAME=$SERVER_HOSTNAME; export VERBOSE=$VERBOSE; cd $PROVISIONER_REMOTE_ROOT && bash $SERVER_PROVISION_FILE |& tee -a /var/log/provisioner.log" 
+  ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" "export SERVER_HOSTNAME=$SERVER_HOSTNAME; export VERBOSE=$VERBOSE; cd $PROVISIONER_REMOTE_ROOT && bash $SERVER_PROVISION_FILE 2>/dev/stdout | tee -a /var/log/provisioner.log" 
 }
 
 bootstrap() {
