@@ -9,9 +9,10 @@ function apply() {
   cd ~/.provisioner
   if [[ -f "$MIGRATION_FILE.head" ]]; then
     if ! diff $MIGRATION_FILE.head $MIGRATION_FILE; then
-      NOW=$(date +"%Y%m%d%H%M%S")
-      mv -f $MIGRATION_FILE.head $MIGRATION_FILE.$NOW
+      CURRENT_MIGRATION=$(cat $MIGRATION_FILE)
       _apply_migration $MIGRATION_FILE
+      NOW=$(date +"%Y%m%d%H%M%S")
+      echo -n $CURRENT_MIGRATION > $MIGRATION_FILE.$NOW
     else
       log "Skipping $MIGRATION_FILE since it has been applied already"
     fi
