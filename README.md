@@ -15,8 +15,8 @@ problems.
 
 ## Features
 
-* Very easy to learn and use since the only knowledge required is writing regular `bash` scripts;
-* Very flexible - everything you can do manually from command line can be also done with Provisioner;
+* Very **easy** to learn and use since the only knowledge required is writing regular `bash` scripts;
+* Very **flexible** - everything you can do manually from command line can be also done with Provisioner;
 * Migrations are **applied only once** and re-applied only when the migration file itself has been changed;
 * It's **blazing fast** since migrations are sent to the server using rsync and only one ssh connection is made to apply all the migrations;
 * Very easy to understand what Provisioner does exactly since it is implemented as **~150 lines** of shell scripts;
@@ -33,9 +33,9 @@ met:
 * Logging in with **root password** over SSH should be allowed and enabled;
 * `rsync` needs to be installed on the current system (it will be installed automatically on the server when needed).
 
-When SSH server is running on a non-22 port already and/or password login is
-not allowed then it is still possible to use Provisioner, but some extra steps
-are needed. See more in _Installation_ section.
+When SSH server is running on a non-standard port already and/or password login is
+disabled then it is still possible to use Provisioner, but some extra steps
+are needed. See more in [Installation](#installation) section.
 
 
 ## Installation
@@ -45,7 +45,7 @@ First, clone provisioner:
 git clone https://github.com/jarmo/provisioner.git
 ```
 
-Create a separate directory where server provisioning scripts will be:
+Create a separate directory where server migration scripts will be:
 ```bash
 mkdir -p example.org-provisioning/migrations
 ```
@@ -80,7 +80,7 @@ cat ~/me
 EOF
 ```
 
-Create a script for applying all provisions:
+Create a script for applying all migrations:
 ```bash
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
@@ -104,8 +104,8 @@ Apply migrations to the server:
 ./provision.sh example.org.sh
 ```
 
-During the first run you will be asked for the root password a couple of times to
-create a SSH key and copy it to the server. After first run of provisioner SSH
+During the first run you will be asked for the remote system root password a couple of times to
+create a SSH key and copy it to the server. After that initial run of Provisioner, SSH
 server will be running on a random port, password authentication via SSH will
 be disabled and a SSH configuration will be created locally into `~/.ssh/config` under the server domain name Host key.
 
@@ -143,10 +143,10 @@ To provision a system a provisioning script is required. This is basically a scr
 everything that should be done on a remote system to configure and set it up - think of installing
 all necessary dependencies and configuring them as you would do manually.
 
-Good practice would be not to do anything manually on the remote system, but
-only use migration files and keep these in the VCS too for better understanding
-of the remote system. You should think of a remote system being a read-only
-system when it comes to installing new packages or configuring anything there.
+Good practice would be not to do any changes manually on the remote system, but
+only use migration files and keep these in the VCS too for having a better understanding
+of the remote system (and for a good disaster recovery/scaling reasons).
+You should think of a remote system being a read-only system when it comes to installing new packages or configuring anything there.
 
 Provisioning file itself is pretty simple. Let's create one without any
 migrations in it:
@@ -163,8 +163,8 @@ EOF
 
 It's pretty straightforward - it has `set -e` automatically enabled to exit
 provisioning as soon as some command fails. `set -x` will be enabled when
-`VERBOSE` mode has been turned on for easier troubleshooting and `lib/remote.sh` is sourced so that a few Provisioner
-helper functions could be used.
+`VERBOSE` mode has been turned on for easier troubleshooting
+and `lib/remote.sh` is sourced so that a few Provisioner helper functions could be used.
 
 Now, adding migrations to the provisiong script is really easy too - just need
 to execute function `apply` with a parameter to migration file. Migration files
@@ -190,18 +190,18 @@ apt upgrade -y
 EOF
 ```
 
-Again, pretty straightforward - standard statements for `set -e` and `set -x` are added and then the important part of running
-`apt` commands for upgrading the system packages. It's always a good idea to do
-this on a new system before doing anything else.
+Again, pretty straightforward - standard statements for `set -e` and `set -x` are added
+and then the important part of running `apt` commands for upgrading the system packages.
+It's always a good idea to do this on a new system before doing anything else.
 
-Now, let's add this migration into our provisioning script otherwise it will
+Let's add this migration into our provisioning script otherwise it will
 not be applied:
 ```bash
 echo "apply migrations/system/upgrade.sh" >> example.org.sh
 ```
 
 Let's apply migrations (we assume that a symlink to `provision.sh` has been
-done already as specified in the _Installation_ section):
+done already as specified in the [Installation](#installation) section):
 ```bash
 ./provision.sh example.org.sh
 ```
@@ -212,59 +212,64 @@ authentication via SSH server is disabled. There will be also a lot of output
 from apt upgrading the system.
 
 If you run the same command again then not much happens because Provision has
-already applied this migration and will not do much. However, as as soon as you
-change migration script then it will be reapplied from the beginning to the
+already applied this migration and will not do much. However, as soon as you
+change that migration script then it will be reapplied from the beginning to the
 end.
 
 
 ## Best Practices
 
-Write migration scripts like you would write database migrations - keep in
-mind that when migration script has been completed successfully then it
+* Write migration scripts like you would write database migrations - keep in
+mind that when migration script has been applied successfully then it
 will be _committed_ which means that Provisioner will not apply it again.
 
-This means that it is a good practice to keep migration scripts as small as possible
+* It is a good practice to keep migration scripts as small as possible
 and as specific as possible - instead of having one big migration script which
 does everything split it into multiple smaller logical steps.
 
-Also, keep in mind that migrations are applied in the order of definition in the provision
+* Keep in mind that migrations are applied in the order of definition in the provision
 script and no migrations are applied after the failing one.
 
-Make sure that if you need to change any already applied migration script then pay
+* When applying of a migration fails then pay close attention at what step did it fail
+because all previously executed commands will be executed again.
+
+* Make sure that if you need to change any already applied migration script then pay
 extra attention to any commands which should not be executed ever more than
 once - maybe adding some extra `if` statement guard around these is good
 enough.
 
-To roll back a migration create a new migration which includes all the
+* To roll back a migration create a new migration which includes all the
 necessary steps to undo changes done by some previous migration instead of
 changing the existing migration.
 
-I recommend running migrations against a local VM before running against
-production so you can test them out on a system similar to production before
-going to destroy the real one.
+* It's recommended applying migrations against a local VM before running against
+a production system so you can test them out on a system similar to production before
+going to destroy the real one. Don't forget to make a snapshot of the VM to
+roll back in case testing fails and you need to re-adjust your migration.
 
 
 ## Troubleshooting
 
 Sometimes things go south. For these situations Provisioner has some ways to
-deal with.
+help you with.
 
 First would be to enable `VERBOSE` mode by running `provision.sh` like this:
 ```bash
 VERBOSE=1 ./provision.sh example.org.sh
 ```
 
-Beware that there will be a lot of output.
+Beware that there will be a lot of output, but hopefully you can find the
+problem.
 
 When this doesn't help or you need to understand what has happened to the
 system over time you can look into server's `/var/log/provisioner.log` where all
-the migrations have been logged.
+the migrations and migration attempts have been logged.
 
 To see all the applied migrations in the past then look into the server `~/.provisioner/migrations`
-directory - there are migrations with suffix `.head` which reflect the latest
-migration and then migrations with `.YYYYMMDDHHMMSS` suffix, which are
-migrations applied in the past. Timestamp suffix reflects the time when that
-migration was replaced by a new one.
+directory - there are migrations with extension `.head` which include the latest
+applied migration script and then migrations with `.YYYYMMDDHHMMSS` extension, which are
+migrations applied in the past. Timestamp extension reflects the time when that
+migration was replaced by a new one and not a time when it was applied.
 
 
 ## License
@@ -278,4 +283,4 @@ in summary means:
 - You **have to share modifications** (e.g. bug-fixes) you've made to this
   program.
 
-For more convoluted language, see the `LICENSE` file.
+For more convoluted language, see the [LICENSE](LICENSE) file.
