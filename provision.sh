@@ -10,6 +10,6 @@ SERVER_PROVISION_FILE="$1"
 
 bootstrap "$SERVER_PROVISION_FILE"
 
-log "Provisioning $SERVER_PROVISION_FILE\n"
+echo -e "Provisioning $SERVER_PROVISION_FILE\n"
 provision "$SERVER_PROVISION_FILE"
-log "Provisioning of $SERVER_PROVISION_FILE completed"
+echo "Provisioning of $SERVER_PROVISION_FILE completed"

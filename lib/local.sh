@@ -32,7 +32,7 @@ bootstrap() {
 
   SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -i '$SSH_KEY_PATH' root@'$SERVER_HOSTNAME' 'test 1 -eq 1'"
   if ! eval "$SSH_LOGIN_COMMAND" || false; then
-    log "Failed to connect using SSH key, trying to copy key to the $SERVER_HOSTNAME"
+    echo "Failed to connect using SSH key, trying to copy key to the $SERVER_HOSTNAME"
     ssh-copy-id -o IdentitiesOnly=yes -i "$SSH_KEY_PATH" root@"$SERVER_HOSTNAME"
     eval "$SSH_LOGIN_COMMAND"
     echo "From now on use SSH key $SSH_KEY_PATH for logging into root@$SERVER_HOSTNAME"
@@ -66,6 +66,3 @@ EOF
   cat $SCRIPT_ROOT/lib/bootstrap-remote.sh | ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" "export PROVISIONER_REMOTE_ROOT=$PROVISIONER_REMOTE_ROOT || setenv PROVISIONER_REMOTE_ROOT $PROVISIONER_REMOTE_ROOT; sh -"
 }
 
-log() {
-  echo -e "[$(date +"%Y-%m-%d %H:%M:%S")] - $1"
-}
