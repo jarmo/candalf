@@ -1,37 +1,35 @@
 # Provisioner
 
-Provisioner is a simple tool that helps to orchestrate Unix-like system
+Provisioner is a simple tool that helps to orchestrate Linux and Unix-like system
 configuration/setup/management using SSH.
 
 There are many tools that do a similar
-thing (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [Puppet](https://puppet.com/) etc.) however
+job (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [Puppet](https://puppet.com/) etc.) however
 Provisioner sets itself apart from them by being much easier to learn and use since there is no need to learn yet another
 specific DSL language.
 
 Provisioner uses shell scripts to do everything which means that
-all is really explicit and really easy to troubleshoot manually in case of any
-problems.
+everything is really explicit and really easy to troubleshoot manually in case of any problems.
 
 
 ## Features
 
-* Very **easy** to learn and use since the only knowledge required is writing regular `bash` scripts;
+* Very **easy** to learn and use since the only knowledge required is writing regular `shell` scripts;
 * Very **flexible** - everything you can do manually from command line can be also done with Provisioner;
 * Migrations are **applied only once** and re-applied only when the migration file itself has been changed;
 * It's **blazing fast** since migrations are sent to the server using rsync and only one ssh connection is made to apply all the migrations;
 * Very easy to understand what Provisioner does exactly since it is implemented as **~150 lines** of shell scripts;
-* Supports **Debian** and **BSD** systems.
+* Supports **Linux** (Debian) and **FreeBSD** (Unix-like) OS-es, but adding support to a new Linux/Unix-like OS is pretty easy too.
 
 
 ## Dependencies
 
-To use Provisioner to provision a clean system, these requirements need to be
-met:
+To use Provisioner to provision a clean system, the following requirements need to be met:
 
-* System should be running **Debian** or **BSD** OS (adding a new Unix-like system support is pretty easy too);
-* SSH server should be running at port **22** and it should be accessible from your system;
+* System should be running a **supported** OS;
+* SSH server should be running at port **22** and it should be accessible from your machine;
 * Logging in with **root password** over SSH should be allowed and enabled;
-* `rsync` needs to be installed on the current system (it will be installed automatically on the server when needed).
+* `rsync` needs to be installed on the current system (it will be installed automatically on the provisioned system when needed).
 
 When SSH server is running on a non-standard port already and/or password login is
 disabled then it is still possible to use Provisioner, but some extra steps
