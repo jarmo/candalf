@@ -8,7 +8,7 @@ thing (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [
 Provisioner sets itself apart from them by being much easier to learn and use since there is no need to learn yet another
 specific DSL language.
 
-Provisioner uses shell scripts (mainly bash) to do everything which means that
+Provisioner uses shell scripts to do everything which means that
 all is really explicit and really easy to troubleshoot manually in case of any
 problems.
 
