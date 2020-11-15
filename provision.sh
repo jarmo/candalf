@@ -4,7 +4,7 @@ set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 PROVISIONER_ROOT=$(dirname $(realpath $0))
-. $PROVISIONER_ROOT/lib/local.sh
+. $PROVISIONER_ROOT/lib/provision.sh
 
 SERVER_PROVISION_FILE="$1"
 

@@ -11,8 +11,8 @@ SSH_OUTPUT_FLAG=$(test "$VERBOSE" != "" && echo "-v" || echo "-q")
 provision() {
   SERVER_PROVISION_FILE="${1:?"server provision file not set!"}"
   SERVER_HOSTNAME=$(basename $SERVER_PROVISION_FILE | rev | cut -d "." -f2- | rev)
-  rsync $SSH_OUTPUT_FLAG -ac $PROVISIONER_ROOT/lib/remote.sh -e "ssh -q" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT/lib/remote.sh
-  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_PROVISION_FILE $(grep -w "apply" $SERVER_PROVISION_FILE | cut -d " " -f 2) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT
+  rsync $SSH_OUTPUT_FLAG -ac $PROVISIONER_ROOT/lib/apply.sh -e "ssh -q" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT/lib/apply.sh
+  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_PROVISION_FILE $(grep -E "^apply .*\.sh" $SERVER_PROVISION_FILE | cut -d " " -f 2) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$PROVISIONER_REMOTE_ROOT
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" "bash -c \"export SERVER_HOSTNAME=$SERVER_HOSTNAME; export PROVISIONER_ROOT=$PROVISIONER_REMOTE_ROOT; export VERBOSE=$VERBOSE; $PROVISIONER_REMOTE_ROOT/$SERVER_PROVISION_FILE 2>&1 | tee -a /var/log/provisioner.log\"" 
 }
 
