@@ -3,8 +3,8 @@
 set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
-SCRIPT_ROOT=$(dirname $(realpath $0))
-. $SCRIPT_ROOT/lib/local.sh
+PROVISIONER_ROOT=$(dirname $(realpath $0))
+. $PROVISIONER_ROOT/lib/local.sh
 
 SERVER_PROVISION_FILE="$1"
 
