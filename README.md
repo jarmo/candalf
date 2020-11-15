@@ -266,7 +266,7 @@ system over time you can look into server's `/var/log/provisioner.log` where all
 the migrations and migration attempts have been logged.
 
 To see all the applied migrations in the past then look into the server `~/.provisioner/migrations`
-directory - there are migrations with extension `.head` which include the latest
+directory - there are migrations with extension `.current` which include the latest
 applied migration script and then migrations with `.YYYYMMDDHHMMSS` extension, which are
 migrations applied in the past. Timestamp extension reflects the time when that
 migration was replaced by a new one and not a time when it was applied.

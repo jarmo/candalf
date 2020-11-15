@@ -9,8 +9,8 @@ function apply() {
   log "Started applying $MIGRATION_FILE"
   PROVISIONER_ROOT=${PROVISIONER_ROOT:="."}
   MIGRATION_PATH="$PROVISIONER_ROOT/$MIGRATION_FILE"
-  if [[ -f "$MIGRATION_PATH.head" ]]; then
-    if ! diff $MIGRATION_PATH.head $MIGRATION_PATH; then
+  if [[ -f "$MIGRATION_PATH.current" ]]; then
+    if ! diff $MIGRATION_PATH.current $MIGRATION_PATH; then
       CURRENT_MIGRATION=$(cat $MIGRATION_PATH)
       _apply_migration $MIGRATION_PATH
       NOW=$(date +"%Y%m%d%H%M%S")
@@ -27,7 +27,7 @@ function apply() {
 function _apply_migration() {
   MIGRATION_PATH=$1
   ${MIGRATION_PATH}
-  cp $MIGRATION_PATH $MIGRATION_PATH.head
+  cp $MIGRATION_PATH $MIGRATION_PATH.current
 }
 
 function log() {
