@@ -19,6 +19,7 @@ function apply() {
       log "Skipping $MIGRATION_FILE since it has been applied already"
     fi
   else
+    cat $MIGRATION_PATH
     _apply_migration $MIGRATION_PATH
   fi
   log "Applying of $MIGRATION_FILE complete\n"
