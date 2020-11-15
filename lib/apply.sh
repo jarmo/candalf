@@ -32,7 +32,8 @@ function apply_as() {
   rsync -Rac lib/apply.sh "$MIGRATION_FILE" "/home/$APPLY_USER"/$(basename "$PROVISIONER_ROOT")
   cd
 
-  su - "$APPLY_USER" -c "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; export PROVISIONER_ROOT=$PROVISIONER_REMOTE_ROOT; export VERBOSE=$VERBOSE; . $(basename $PROVISIONER_ROOT)/lib/apply.sh; apply $(basename $PROVISIONER_ROOT)/$MIGRATION_FILE'"
+  PROVISIONER_DIR_NAME=$(basename $PROVISIONER_ROOT)
+  su - "$APPLY_USER" -c "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; export PROVISIONER_ROOT=$PROVISIONER_REMOTE_ROOT; export VERBOSE=$VERBOSE; . $PROVISIONER_DIR_NAME/lib/apply.sh; apply $PROVISIONER_DIR_NAME/$MIGRATION_FILE'"
 }
 
 function _apply_migration() {
