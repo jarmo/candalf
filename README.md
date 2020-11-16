@@ -1,6 +1,6 @@
 # Candalf
 
-Candalf is a server wizard with can-do attitude! He can cast spells on your
+Candalf is a server wizard with a can-do attitude! He can cast spells on your
 systems to make them turn into what you love.
 
 
