@@ -53,7 +53,7 @@ git clone https://github.com/jarmo/candalf.git
 ```
 
 Create a symlink into some directory in your `$PATH`, for example:
-```
+```bash
 sudo ln -s $(realpath candalf/candalf.sh) /usr/local/bin/candalf
 ```
 
@@ -182,7 +182,7 @@ For example `spells/nginx` directory could have files called
 to allow traffic to ports 80/443 respectively. Let's add one spell to the
 spell book, which updates and upgrades all packages on the remote Debian system:
 
-```
+```bash
 mkdir -p spells/system
 
 cat << 'EOF' > spells/system/upgrade.sh
