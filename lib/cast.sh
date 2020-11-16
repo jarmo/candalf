@@ -8,7 +8,7 @@ function cast() {
   cd
   CANDALF_ROOT=${CANDALF_ROOT:="."}
   SPELL_PATH="$(realpath "$CANDALF_ROOT/$SPELL_FILE")"
-  log "Casting $SPELL_PATH as the user $USER"
+  log "Casting spell $SPELL_PATH as the user $USER"
   if [[ -f "$SPELL_PATH.current" ]]; then
     if ! diff $SPELL_PATH.current $SPELL_PATH; then
       CURRENT_SPELL=$(cat $SPELL_PATH)
@@ -16,13 +16,13 @@ function cast() {
       NOW=$(date +"%Y%m%d%H%M%S")
       echo -n $CURRENT_SPELL > $SPELL_PATH.$NOW
     else
-      log "Skipping $SPELL_PATH since it has been cast already as the user $USER"
+      log "Skipping spell $SPELL_PATH since it has been cast already as the user $USER"
     fi
   else
     cat $SPELL_PATH
     _cast $SPELL_PATH
   fi
-  log "Casting $SPELL_PATH completed as the user $USER\n"
+  log "Casting spell $SPELL_PATH completed as the user $USER\n"
 }
 
 function cast_as() {
