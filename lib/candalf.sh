@@ -31,6 +31,9 @@ bootstrap() {
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
+  eval $(ssh-agent -s) >/dev/null
+  ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
+
   SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -i '$SSH_KEY_PATH' root@'$SERVER_HOSTNAME' 'true'"
   if ! eval "$SSH_LOGIN_COMMAND" || false; then
     echo "Failed to login using SSH key, trying to copy key to the $SERVER_HOSTNAME"
