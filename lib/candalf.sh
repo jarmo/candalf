@@ -12,7 +12,7 @@ candalf() {
   SERVER_CANDALF_FILE="${1:?"server candalf file not set!"}"
   SERVER_HOSTNAME=$(basename $SERVER_CANDALF_FILE | rev | cut -d "." -f2- | rev)
   rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh -e "ssh -q" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib/cast.sh
-  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_CANDALF_FILE $(grep -E "^cast .*\.sh" $SERVER_CANDALF_FILE | cut -d " " -f 2) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
+  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_CANDALF_FILE $(grep -E "^cast.*\.sh" $SERVER_CANDALF_FILE | rev | cut -d " " -f 1 | rev) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; export VERBOSE=$VERBOSE; $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1 | tee -a /var/log/candalf.log'" 
 }
 
