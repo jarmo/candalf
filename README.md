@@ -43,20 +43,20 @@ First, clone provisioner:
 git clone https://github.com/jarmo/provisioner.git
 ```
 
-Create a separate directory where server migration scripts will be:
-```bash
-mkdir -p example.org-provisioning/migrations
+Create a symlink into some directory in your `$PATH`, for example:
+```
+sudo ln -s $(realpath provisioner/provision.sh) /usr/local/bin/provision
 ```
 
-Reference `provision.sh` from that directory so that it would be possible to
-execute it directly from your `example.org-provisioning` directory:
+Create a separate project/directory for your server migration scripts:
 ```bash
-cd example.org-provisioning
-ln -s /absolute/path/to/provisioner/provision.sh
+mkdir -p example.org/migrations
 ```
 
 Create your first `migration` scripts:
 ```bash
+cd example.org
+
 cat << 'EOF' > migrations/now.sh
 #!/usr/bin/env bash
 
@@ -64,7 +64,6 @@ set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 date > ~/now
-cat ~/now
 EOF
 
 cat << 'EOF' > migrations/me.sh
@@ -74,7 +73,6 @@ set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 id -un > ~/me
-cat ~/me
 EOF
 ```
 
@@ -86,29 +84,28 @@ cat << 'EOF' > example.org.sh
 set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
-. lib/remote.sh
+. ${PROVISIONER_ROOT:="."}/lib/apply.sh
 
 apply migrations/now.sh 
 apply migrations/me.sh
 EOF
 ```
 
-PS! File name should include the actual domain name for the server (in this
+PS! File name should be the actual domain name for the server (in this
 case it's `example.org`) because Provisioner uses that name to connect to the
 correct server.
 
 Apply migrations to the server:
 ```bash
-./provision.sh example.org.sh
+provision example.org.sh
 ```
 
-During the first run you will be asked for the remote system root password a couple of times to
+During the first run you will be asked a couple of times the root password of the remote system to
 create a SSH key and copy it to the server. After that initial run of Provisioner, SSH
 server will be running on a random port, password authentication via SSH will
 be disabled and a SSH configuration will be created locally into `~/.ssh/config` under the server domain name Host key.
 
-For the example above, there will be an entry in the `~/.ssh/config` like the
-following:
+For the example above, there will be an entry in the `~/.ssh/config` like the following:
 ```bash
 Host example.org 
   Hostname example.org
@@ -122,22 +119,22 @@ Host example.org
 ```
 
 There will be also SSH public/private key under `~/.ssh` having the server domain
-name as their file names.
+name as their file names (~/.ssh/example.org and ~/.ssh/example.org.pub respectively).
 
 
 ### Installation With Preconfigured SSH Server
 
 When server does not have password authentication enabled over SSH then it's
 easy to start using Provisioner too. Just make sure that you have
-private/public key under `~/.ssh` having same name as your server domain name
+private/public key under `~/.ssh` having the same name as your server domain name
 and create a SSH configuration similar to shown above.
 This will make Provisioner to assume that SSH authentication with a public key
-has been already completed and you can use it normally.
+has been already completed and you can start using it normally.
 
 
 ## Provisioning
 
-To provision a system a provisioning script is required. This is basically a script which describes
+The provisioning script is required to provision a system. This is basically a script which describes
 everything that should be done on a remote system to configure and set it up - think of installing
 all necessary dependencies and configuring them as you would do manually.
 
@@ -155,22 +152,22 @@ cat << 'EOF' > example.org.sh
 set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
-. lib/remote.sh
+. ${PROVISIONER_ROOT:="."}/lib/apply.sh
 EOF
 ```
 
 It's pretty straightforward - it has `set -e` automatically enabled to exit
 provisioning as soon as some command fails. `set -x` will be enabled when
 `VERBOSE` mode has been turned on for easier troubleshooting
-and `lib/remote.sh` is sourced so that a few Provisioner helper functions could be used.
+and `lib/apply.sh` is sourced so that a few Provisioner helper functions could be used.
 
 Now, adding migrations to the provisiong script is really easy too - just need
 to execute function `apply` with a parameter to migration file. Migration files
 can be placed anywhere but the argument to `apply` function should have
-a relative path to the file. It's a good practice to put them under directory
+a relative path from the provision script to the file. It's a good practice to put them under directory
 called `migrations` and add there separate subdirectories for different
 dependencies, for example `migrations/nginx` directory could have files called
-`nginx.sh` and `firewall.sh` which would install nginx and configure firewall
+`nginx.sh` and `firewall.sh` which would install Nginx and configure firewall
 to allow traffic to ports 80/443 respectively. Let's add one migration to the
 provisioner, which updates and upgrades all packages on the remote Debian system:
 
@@ -198,10 +195,10 @@ not be applied:
 echo "apply migrations/system/upgrade.sh" >> example.org.sh
 ```
 
-Let's apply migrations (we assume that a symlink to `provision.sh` has been
-done already as specified in the [Installation](#installation) section):
+Let's apply migrations (we assume that Provisioner itself has been installed already
+as specified in the [Installation](#installation) section):
 ```bash
-./provision.sh example.org.sh
+provision example.org.sh
 ```
 
 If everything goes well then a SSH key is going to be created, it will be
@@ -209,7 +206,7 @@ copied to the server, SSH server will be running on a random port and password
 authentication via SSH server is disabled. There will be also a lot of output
 from apt upgrading the system.
 
-If you run the same command again then not much happens because Provision has
+If you run the same command again then not much happens because Provisioner has
 already applied this migration and will not do much. However, as soon as you
 change that migration script then it will be reapplied from the beginning to the
 end.
@@ -231,7 +228,7 @@ script and no migrations are applied after the failing one.
 * When applying of a migration fails then pay close attention at what step did it fail
 because all previously executed commands will be executed again.
 
-* Make sure that if you need to change any already applied migration script then pay
+* Make sure that if you need to change any already applied migration scripts then pay
 extra attention to any commands which should not be executed ever more than
 once - maybe adding some extra `if` statement guard around these is good
 enough.
@@ -241,8 +238,8 @@ necessary steps to undo changes done by some previous migration instead of
 changing the existing migration.
 
 * It's recommended applying migrations against a local VM before running against
-a production system so you can test them out on a system similar to production before
-going to destroy the real one. Don't forget to make a snapshot of the VM to
+a production system so you can test them out on a system similar to the production environment 
+before going to destroy the real one. Don't forget to make a snapshot of the VM to
 roll back in case testing fails and you need to re-adjust your migration.
 
 
@@ -265,7 +262,7 @@ the migrations and migration attempts have been logged.
 
 To see all the applied migrations in the past then look into the server `~/.provisioner/migrations`
 directory - there are migrations with extension `.current` which include the latest
-applied migration script and then migrations with `.YYYYMMDDHHMMSS` extension, which are
+applied migration script and then migrations with `.YYYYmmddHHMMSS` extension, which are
 migrations applied in the past. Timestamp extension reflects the time when that
 migration was replaced by a new one and not a time when it was applied.
 
