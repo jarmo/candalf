@@ -1,63 +1,72 @@
-# Provisioner
+# Candalf
 
-Provisioner is a simple tool that helps to orchestrate Linux and Unix-like system
+Candalf is a server wizard with can-do attitude! He can cast spells on your
+systems to make them turn into systems you will love.
+
+
+## Spells?! Wait, What?!
+
+Now that Candalf has gotten your attention we can talk more seriously.
+
+Candalf is a simple tool that helps to orchestrate Linux and Unix-like system
 configuration/setup/management using SSH.
 
 There are many tools that do a similar
 job (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [Puppet](https://puppet.com/) etc.) however
-Provisioner sets itself apart from them by being much easier to learn and use since there is no need to learn yet another
+Candalf sets itself apart from them by being much easier to learn and use since there is no need to learn yet another
 specific DSL language.
 
-Provisioner uses shell scripts to do everything which means that
-everything is really explicit and really easy to troubleshoot manually in case of any problems.
+Candalf uses shell scripts (called spells) to do everything which means that it's is really simple, explicit and easy to troubleshoot
+manually in case of any problems.
 
 
 ## Features
 
 * Very **easy** to learn and use since the only knowledge required is writing regular `shell` scripts;
-* Very **flexible** - everything you can do manually from command line can be also done with Provisioner;
-* Migrations are **applied only once** and re-applied only when the migration file itself has been changed;
-* It's **blazing fast** since migrations are sent to the server using rsync and only one ssh connection is made to apply all the migrations;
-* Very easy to understand what Provisioner does exactly since it is implemented as **~150 lines** of shell scripts;
-* Supports **Linux** (Debian) and **FreeBSD** (Unix-like) OS-es, but adding support to a new Linux/Unix-like OS is pretty easy too.
+* Very **flexible** - everything you can do manually from command line can be also done with Candalf;
+* Very easy to install since there are no dependencies except a **shell** and Candalf itself;
+* Spells are **cast only once** and cast again only when the spell file itself has been changed;
+* It's **blazing fast** since spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
+* Very easy to understand what Candalf does exactly since it is implemented as **~150 lines** of shell scripts;
+* Supports **Ubuntu** (Debian Linux) and **FreeBSD** (Unix-like) OS-es, but adding support to a new Linux/Unix-like OS is pretty easy too.
 
 
 ## Dependencies
 
-To use Provisioner to provision a clean system, the following requirements need to be met:
+To use Candalf to cast spells to a clean system, the following requirements need to be met:
 
 * System should be running a **supported** OS;
 * SSH server should be running at port **22** and it should be accessible from your machine;
 * Logging in with **root password** over SSH should be allowed and enabled;
-* `rsync` needs to be installed on the current system (it will be installed automatically on the provisioned system when needed).
+* `rsync` needs to be installed on the current system (it will be installed automatically on the remote system when needed).
 
 When SSH server is running on a non-standard port already and/or password login is
-disabled then it is still possible to use Provisioner, but some extra steps
+disabled then it is still possible to use Candalf, but some extra steps
 are needed. See more in [Installation](#installation) section.
 
 
 ## Installation
 
-First, clone provisioner:
+First, clone Candalf itself:
 ```bash
-git clone https://github.com/jarmo/provisioner.git
+git clone https://github.com/jarmo/candalf.git
 ```
 
 Create a symlink into some directory in your `$PATH`, for example:
 ```
-sudo ln -s $(realpath provisioner/provision.sh) /usr/local/bin/provision
+sudo ln -s $(realpath candalf/candalf.sh) /usr/local/bin/candalf
 ```
 
-Create a separate project/directory for your server migration scripts:
+Create a separate project/directory for your server spell scripts:
 ```bash
-mkdir -p example.org/migrations
+mkdir -p example.org/spells
 ```
 
-Create your first `migration` scripts:
+Create your first spell scripts:
 ```bash
 cd example.org
 
-cat << 'EOF' > migrations/now.sh
+cat << 'EOF' > spells/now.sh
 #!/usr/bin/env bash
 
 set -e
@@ -66,7 +75,7 @@ if [[ "$VERBOSE" != "" ]]; then set -x; fi
 date > ~/now
 EOF
 
-cat << 'EOF' > migrations/me.sh
+cat << 'EOF' > spells/me.sh
 #!/usr/bin/env bash
 
 set -e
@@ -76,7 +85,7 @@ id -un > ~/me
 EOF
 ```
 
-Create a script for applying all migrations:
+Create a script for casting all the spells:
 ```bash
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
@@ -84,24 +93,24 @@ cat << 'EOF' > example.org.sh
 set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
-. ${PROVISIONER_ROOT:="."}/lib/apply.sh
+. ${CANDALF_ROOT:="."}/lib/cast.sh
 
-apply migrations/now.sh 
-apply migrations/me.sh
+cast spell/now.sh 
+cast spell/me.sh
 EOF
 ```
 
 PS! File name should be the actual domain name for the server (in this
-case it's `example.org`) because Provisioner uses that name to connect to the
+case it's `example.org`) because Candalf uses that name to connect to the
 correct server.
 
-Apply migrations to the server:
+Cast all spells to the server:
 ```bash
-provision example.org.sh
+candalf example.org.sh
 ```
 
 During the first run you will be asked a couple of times the root password of the remote system to
-create a SSH key and copy it to the server. After that initial run of Provisioner, SSH
+create a SSH key and copy it to the server. After that initial run of Candalf, SSH
 server will be running on a random port, password authentication via SSH will
 be disabled and a SSH configuration will be created locally into `~/.ssh/config` under the server domain name Host key.
 
@@ -125,26 +134,25 @@ name as their file names (~/.ssh/example.org and ~/.ssh/example.org.pub respecti
 ### Installation With Preconfigured SSH Server
 
 When server does not have password authentication enabled over SSH then it's
-easy to start using Provisioner too. Just make sure that you have
+easy to start using Candalf too. Just make sure that you have
 private/public key under `~/.ssh` having the same name as your server domain name
 and create a SSH configuration similar to shown above.
-This will make Provisioner to assume that SSH authentication with a public key
+This will make Candalf to assume that SSH authentication with a public key
 has been already completed and you can start using it normally.
 
 
-## Provisioning
+## Spell Book
 
-The provisioning script is required to provision a system. This is basically a script which describes
-everything that should be done on a remote system to configure and set it up - think of installing
+A spell book script is required to cast spells to a system. This is basically a script which describes
+all the spells that should be cast on a remote system to configure and set it up - think of installing
 all necessary dependencies and configuring them as you would do manually.
 
 Good practice would be not to do any changes manually on the remote system, but
-only use migration files and keep these in the VCS too for having a better understanding
+only use spell files and keep these in the VCS too for having a better understanding
 of the remote system (and for a good disaster recovery/scaling reasons).
 You should think of a remote system being a read-only system when it comes to installing new packages or configuring anything there.
 
-Provisioning file itself is pretty simple. Let's create one without any
-migrations in it:
+Spell book script of a server is pretty simple. Let's create one without any spells in it:
 ```bash
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
@@ -152,29 +160,32 @@ cat << 'EOF' > example.org.sh
 set -e
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
-. ${PROVISIONER_ROOT:="."}/lib/apply.sh
+. ${CANDALF_ROOT:="."}/lib/cast.sh
 EOF
 ```
 
 It's pretty straightforward - it has `set -e` automatically enabled to exit
-provisioning as soon as some command fails. `set -x` will be enabled when
+casting spells as soon as some command fails. `set -x` will be enabled when
 `VERBOSE` mode has been turned on for easier troubleshooting
-and `lib/apply.sh` is sourced so that a few Provisioner helper functions could be used.
+and `lib/cast.sh` is sourced so that a few Candalf helper functions could be used.
+One important thing to notice here is that the name of the spell book script
+file has to match the domain name of the server you want to cast all the spells.
 
-Now, adding migrations to the provisiong script is really easy too - just need
-to execute function `apply` with a parameter to migration file. Migration files
-can be placed anywhere but the argument to `apply` function should have
-a relative path from the provision script to the file. It's a good practice to put them under directory
-called `migrations` and add there separate subdirectories for different
-dependencies, for example `migrations/nginx` directory could have files called
+Now, adding spells to the spell book script is really easy too - just need
+to execute function `cast` with a parameter to spell file. Spell files
+can be placed anywhere but the argument to `cast` function should have
+a relative path from the spell book script to the file.
+It's a good practice to put them under directory
+called `spells` with separate subdirectories for different dependencies.
+For example `spells/nginx` directory could have files called
 `nginx.sh` and `firewall.sh` which would install Nginx and configure firewall
-to allow traffic to ports 80/443 respectively. Let's add one migration to the
-provisioner, which updates and upgrades all packages on the remote Debian system:
+to allow traffic to ports 80/443 respectively. Let's add one spell to the
+spell book, which updates and upgrades all packages on the remote Debian system:
 
 ```
-mkdir -p migrations/system
+mkdir -p spells/system
 
-cat << 'EOF' > migrations/system/upgrade.sh
+cat << 'EOF' > spells/system/upgrade.sh
 #!/usr/bin/env bash
 
 set -e
@@ -185,20 +196,19 @@ apt upgrade -y
 EOF
 ```
 
-Again, pretty straightforward - standard statements for `set -e` and `set -x` are added
+Again pretty straightforward - standard statements for `set -e` and `set -x` are added
 and then the important part of running `apt` commands for upgrading the system packages.
 It's always a good idea to do this on a new system before doing anything else.
 
-Let's add this migration into our provisioning script otherwise it will
-not be applied:
+Let's add this spell into our spell book script otherwise it will not be cast:
 ```bash
-echo "apply migrations/system/upgrade.sh" >> example.org.sh
+echo "cast spells/system/upgrade.sh" >> example.org.sh
 ```
 
-Let's apply migrations (we assume that Provisioner itself has been installed already
+Let's cast all the defined spells (we assume that Candalf itself has been installed already
 as specified in the [Installation](#installation) section):
 ```bash
-provision example.org.sh
+candalf example.org.sh
 ```
 
 If everything goes well then a SSH key is going to be created, it will be
@@ -206,70 +216,70 @@ copied to the server, SSH server will be running on a random port and password
 authentication via SSH server is disabled. There will be also a lot of output
 from apt upgrading the system.
 
-If you run the same command again then not much happens because Provisioner has
-already applied this migration and will not do much. However, as soon as you
-change that migration script then it will be reapplied from the beginning to the
+If you run the same command again then not much happens because Candalf has
+already cast this spell and will not do much again. However, as soon as you
+change that spell script then it will be cast again from the beginning to the
 end.
 
 
 ## Best Practices
 
-* Write migration scripts like you would write database migrations - keep in
-mind that when migration script has been applied successfully then it
-will be _committed_ which means that Provisioner will not apply it again.
+* Write spell scripts like you would write database migrations - keep in
+mind that when spell script has been cast successfully then it
+will be _committed_ which means that Candalf will not cast it again.
 
-* It is a good practice to keep migration scripts as small as possible
-and as specific as possible - instead of having one big migration script which
-does everything split it into multiple smaller logical steps.
+* It is a good practice to keep spell scripts as small as possible
+and as specific as possible - instead of having one big spell script which
+does everything split it into multiple smaller logical ones.
 
-* Keep in mind that migrations are applied in the order of definition in the provision
-script and no migrations are applied after the failing one.
+* Keep in mind that spells are applied in the order of definition in the spell
+book script and no spells are cast after the failing one.
 
-* When applying of a migration fails then pay close attention at what step did it fail
+* When casting of a spell fails then pay close attention at what step did it fail
 because all previously executed commands will be executed again.
 
-* Make sure that if you need to change any already applied migration scripts then pay
+* Make sure that if you need to change any already cast spell scripts then pay
 extra attention to any commands which should not be executed ever more than
 once - maybe adding some extra `if` statement guard around these is good
 enough.
 
-* To roll back a migration create a new migration which includes all the
-necessary steps to undo changes done by some previous migration instead of
-changing the existing migration.
+* To undo a spell create a new spell which includes all the
+necessary steps to revert changes done by some previous spell instead of
+changing the existing spell.
 
-* It's recommended applying migrations against a local VM before running against
+* It's recommended casting spells against a local VM before running against
 a production system so you can test them out on a system similar to the production environment 
 before going to destroy the real one. Don't forget to make a snapshot of the VM to
-roll back in case testing fails and you need to re-adjust your migration.
+roll back in case testing fails and you need to re-adjust your spell.
 
 
 ## Troubleshooting
 
-Sometimes things go south. For these situations Provisioner has some ways to
+Sometimes things go south. For these situations Candalf has some ways to
 help you with.
 
-First would be to enable `VERBOSE` mode by running `provision.sh` like this:
+You can enable `VERBOSE` mode by running `candalf` like this:
 ```bash
-VERBOSE=1 ./provision.sh example.org.sh
+VERBOSE=1 candalf example.org.sh
 ```
 
 Beware that there will be a lot of output, but hopefully you can find the
 problem.
 
 When this doesn't help or you need to understand what has happened to the
-system over time you can look into server's `/var/log/provisioner.log` where all
-the migrations and migration attempts have been logged.
+system over time you can look into server's `/var/log/candalf.log` where all
+the casted spells and attempts of casting any spells have been logged.
 
-To see all the applied migrations in the past then look into the server `~/.provisioner/migrations`
-directory - there are migrations with extension `.current` which include the latest
-applied migration script and then migrations with `.YYYYmmddHHMMSS` extension, which are
-migrations applied in the past. Timestamp extension reflects the time when that
-migration was replaced by a new one and not a time when it was applied.
+To see all the casted spells in the past then look into the server `~/.candalf/spells`
+directory - there are spells with extension `.current` which include the latest
+cast spell script and then spells with `.YYYYmmddHHMMSS` extension, which are
+spells applied in the past. Timestamp extension reflects the time when that
+spell was replaced by a new one and not a time when it was cast.
 
 
 ## License
 
-Provisioner is released under a *Lesser GNU Affero General Public License*, which
+Candalf is released under a *Lesser GNU Affero General Public License*, which
 in summary means:
 
 - You **can** use this program for **no cost**.
