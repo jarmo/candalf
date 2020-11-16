@@ -8,7 +8,7 @@ function apply() {
   cd
   PROVISIONER_ROOT=${PROVISIONER_ROOT:="."}
   MIGRATION_PATH="$(realpath "$PROVISIONER_ROOT/$MIGRATION_FILE")"
-  log "Started applying $MIGRATION_PATH as user $USER"
+  log "Applying $MIGRATION_PATH as the user $USER"
   if [[ -f "$MIGRATION_PATH.current" ]]; then
     if ! diff $MIGRATION_PATH.current $MIGRATION_PATH; then
       CURRENT_MIGRATION=$(cat $MIGRATION_PATH)
@@ -16,13 +16,13 @@ function apply() {
       NOW=$(date +"%Y%m%d%H%M%S")
       echo -n $CURRENT_MIGRATION > $MIGRATION_PATH.$NOW
     else
-      log "Skipping $MIGRATION_PATH since it has been applied already as user $USER"
+      log "Skipping $MIGRATION_PATH since it has been applied already as the user $USER"
     fi
   else
     cat $MIGRATION_PATH
     _apply_migration $MIGRATION_PATH
   fi
-  log "Applying of $MIGRATION_PATH complete as user $USER\n"
+  log "Applying of $MIGRATION_PATH completed as the user $USER\n"
 }
 
 function apply_as() {
