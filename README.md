@@ -229,6 +229,36 @@ change that spell script then it will be cast again from the beginning to the
 end.
 
 
+## Casting Spells for Unprivileged Users
+
+Since Candalf connects to the server using `root` user by default then all
+spells are casted to that user. However, if you need to cast spells to other
+users then this is also possible.
+
+Here's how we would do that:
+```bash
+mkdir -p spells/john
+
+cat << 'EOF' > spells/john/whoami.sh
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [[ "$VERBOSE" != "" ]]; then set -x; fi
+
+whoami
+EOF
+
+echo "cast_as john spells/john/whoami.sh" >> example.org.sh
+
+candalf example.org.sh
+```
+
+Notice that instead of using function `cast` we need to use function called
+`cast_as` with a user name parameter and a spell path. That's the only
+difference between applying spells to the `root` or to the specific user.
+
+
 ## Best Practices
 
 * Write spell scripts like you would write database migrations - keep in
