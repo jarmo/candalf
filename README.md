@@ -1,7 +1,7 @@
 # Candalf
 
 Candalf is a server wizard with a can-do attitude! He can cast spells on your
-systems to make them turn into what you love.
+systems to make them turn into what you want.
 
 
 ## Spells?! Wait, What?!
@@ -16,7 +16,7 @@ job (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [Pu
 Candalf sets itself apart from them by being much easier to learn and use since there is no need to learn yet another
 specific DSL language.
 
-Candalf uses shell scripts (called spells) to do everything which means that it's is really simple, explicit and easy to troubleshoot
+Candalf uses shell scripts (called spells) to do everything which means that it's really simple, explicit and easy to troubleshoot
 manually in case of any problems.
 
 
@@ -26,9 +26,10 @@ manually in case of any problems.
 * Very **flexible** - everything you can do manually from command line can be also done with Candalf;
 * Very easy to install since there are no dependencies except a **shell** and Candalf itself;
 * Spells are **cast only once** and cast again only when the spell file itself has been changed;
-* It's **blazing fast** since spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
+* It's **blazing fast** since only changed spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
+* Any shell is supported since spells are executed using their **shebang** line;
 * Very easy to understand what Candalf does exactly since it is implemented as **~150 lines** of shell scripts;
-* Supports **Ubuntu** (Debian Linux) and **FreeBSD** (Unix-like) OS-es, but adding support to a new Linux/Unix-like OS is pretty easy too.
+* Supports **Ubuntu** (Debian Linux) and **FreeBSD** (Unix-like) OS-es out of the box, but adding support to a new Linux/Unix-like OS is pretty easy too.
 
 
 ## Dependencies
