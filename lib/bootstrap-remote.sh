@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [ "$VERBOSE" != "" ]; then set -x; fi
 
 mkdir -p $CANDALF_ROOT/lib
 mkdir -p /var/log

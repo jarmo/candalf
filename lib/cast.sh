@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-set -e
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [ "$VERBOSE" != "" ]; then set -x; fi
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
@@ -28,12 +29,13 @@ function cast() {
 function cast_as() {
   CAST_USER="${1:?"CAST_USER not set!"}"
   SPELL_FILE="${2:?"SPELL_FILE not set!"}"
+  CANDALF_ROOT=${CANDALF_ROOT:="."}
   CANDALF_DIR_NAME=$(basename $CANDALF_ROOT)
   cd $CANDALF_ROOT
   rsync -Rac lib/cast.sh "$SPELL_FILE" "/home/$CAST_USER/$CANDALF_DIR_NAME"
   cd
 
-  su - "$CAST_USER" -c "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; export VERBOSE=$VERBOSE; . $CANDALF_DIR_NAME/lib/cast.sh; cast $CANDALF_DIR_NAME/$SPELL_FILE'"
+  su - "$CAST_USER" -c "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"; export VERBOSE=$VERBOSE; . $CANDALF_DIR_NAME/lib/cast.sh; cast $SPELL_FILE'"
 }
 
 function _cast() {

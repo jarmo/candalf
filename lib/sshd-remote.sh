@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [ "$VERBOSE" != "" ]; then set -x; fi
 
 compat_sed() {
   SUBSITUTION_CMD="$1"

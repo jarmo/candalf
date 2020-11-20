@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 
+set -Eeuo pipefail
 VERBOSE="${VERBOSE:-""}"
-
-set -e
 if [ "$VERBOSE" != "" ]; then set -x; fi
 
 CANDALF_REMOTE_ROOT='~/.candalf'

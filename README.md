@@ -70,7 +70,8 @@ cd example.org
 cat << 'EOF' > spells/now.sh
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 date > ~/now
@@ -79,7 +80,8 @@ EOF
 cat << 'EOF' > spells/me.sh
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 id -un > ~/me
@@ -91,7 +93,8 @@ Create a script for casting all the spells:
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 . ${CANDALF_ROOT:="."}/lib/cast.sh
@@ -158,16 +161,18 @@ Spell book script of a server is pretty simple. Let's create one without any spe
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 . ${CANDALF_ROOT:="."}/lib/cast.sh
 EOF
 ```
 
-It's pretty straightforward - it has `set -e` automatically enabled to exit
-casting spells as soon as some command fails. `set -x` will be enabled when
-`VERBOSE` mode has been turned on for easier troubleshooting
+It's pretty straightforward - first it has a `shebang` line which instructs
+Bash to be used as a running shell, then a bunch of important `set` commands (read from
+the shell manual or
+from [this blog post](https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/) to understand what they're for)
 and `lib/cast.sh` is sourced so that a few Candalf helper functions could be used.
 One important thing to notice here is that the name of the spell book script
 file has to match the domain name of the server you want to cast all the spells.
@@ -189,7 +194,8 @@ mkdir -p spells/system
 cat << 'EOF' > spells/system/upgrade.sh
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 apt update -y
@@ -197,8 +203,8 @@ apt upgrade -y
 EOF
 ```
 
-Again pretty straightforward - standard statements for `set -e` and `set -x` are added
-and then the important part of running `apt` commands for upgrading the system packages.
+Again pretty straightforward - standard boiler-place code in the header of the
+script and then the important part of running `apt` commands for upgrading the system packages.
 It's always a good idea to do this on a new system before doing anything else.
 
 Let's add this spell into our spell book script otherwise it will not be cast:

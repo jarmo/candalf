@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
 if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 CANDALF_ROOT=$(dirname $(realpath $0))
