@@ -31,6 +31,8 @@ bootstrap() {
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
+  trap kill_ssh_agent ERR
+  trap kill_ssh_agent EXIT
   eval $(ssh-agent -s) >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 
@@ -70,3 +72,6 @@ EOF
   cat $CANDALF_ROOT/lib/bootstrap-remote.sh | ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT 2>/dev/null || setenv CANDALF_ROOT $CANDALF_REMOTE_ROOT; sh -"
 }
 
+kill_ssh_agent() {
+  [ "$SSH_AGENT_PID" ] && kill $SSH_AGENT_PID
+}
