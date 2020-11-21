@@ -10,9 +10,20 @@ SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
 candalf() {
   SERVER_CANDALF_FILE="${1:?"server candalf file not set!"}"
   SERVER_HOSTNAME=$(basename $SERVER_CANDALF_FILE | rev | cut -d "." -f2- | rev)
-  rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh -e "ssh -q" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib/cast.sh
-  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_CANDALF_FILE $(grep -E "^cast.*\.sh" $SERVER_CANDALF_FILE | rev | awk '{print $1}' | rev) -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
-  ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; export VERBOSE=$VERBOSE; $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1 | tee -a /var/log/candalf.log'" 
+
+  rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh -e "ssh -q" \
+    $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib/cast.sh
+
+  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_CANDALF_FILE \
+    $(grep -E "^cast.*\.sh" $SERVER_CANDALF_FILE | rev | awk '{print $1}' | rev) \
+    -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
+
+  ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
+    "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
+      export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
+      export VERBOSE=$VERBOSE; \
+      $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1 | \
+        tee -a /var/log/candalf.log'" 
 }
 
 bootstrap() {
@@ -26,7 +37,15 @@ bootstrap() {
 
   if [ ! -f "$SSH_KEY_PATH" ]; then
     echo "Trying to login to $SERVER_HOSTNAME by using root password"
-    ssh $SSH_OUTPUT_FLAG -tt -o PubkeyAuthentication=no -o PasswordAuthentication=yes -o IdentitiesOnly=yes -o PreferredAuthentications=password root@"$SERVER_HOSTNAME" 'echo "Logged successfully into $HOST for the first time, creating key"'
+
+    ssh $SSH_OUTPUT_FLAG -tt \
+      -o PubkeyAuthentication=no \
+      -o PasswordAuthentication=yes \
+      -o IdentitiesOnly=yes \
+      -o PreferredAuthentications=password \
+      root@"$SERVER_HOSTNAME" \
+      'echo "Logged successfully into $HOST for the first time, creating key"'
+
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
@@ -35,7 +54,14 @@ bootstrap() {
   eval $(ssh-agent -s) >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 
-  SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -i '$SSH_KEY_PATH' root@'$SERVER_HOSTNAME' 'true'"
+  SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt \
+    -o PubkeyAuthentication=yes \
+    -o PasswordAuthentication=no \
+    -o IdentitiesOnly=yes \
+    -o PreferredAuthentications=publickey \
+    -i '$SSH_KEY_PATH' \
+    root@'$SERVER_HOSTNAME' 'true'"
+
   if ! eval "$SSH_LOGIN_COMMAND" || false; then
     echo "Failed to login using SSH key, trying to copy key to the $SERVER_HOSTNAME"
     ssh-copy-id -o IdentitiesOnly=yes -i "$SSH_KEY_PATH" root@"$SERVER_HOSTNAME"
@@ -50,7 +76,17 @@ bootstrap() {
   fi    
 
   if ! nc -z "$SERVER_HOSTNAME" $SSH_SERVER_PORT; then
-    cat $CANDALF_ROOT/lib/sshd-remote.sh | ssh $SSH_OUTPUT_FLAG -o PubkeyAuthentication=yes -o PasswordAuthentication=no -o IdentitiesOnly=yes -o PreferredAuthentications=publickey -i "$SSH_KEY_PATH" root@"$SERVER_HOSTNAME" "export SSH_SERVER_PORT=$SSH_SERVER_PORT 2>/dev/null || setenv SSH_SERVER_PORT $SSH_SERVER_PORT; sh -"
+    cat $CANDALF_ROOT/lib/sshd-remote.sh | \
+      ssh $SSH_OUTPUT_FLAG \
+      -o PubkeyAuthentication=yes \
+      -o PasswordAuthentication=no \
+      -o IdentitiesOnly=yes \
+      -o PreferredAuthentications=publickey \
+      -i "$SSH_KEY_PATH" \
+      root@"$SERVER_HOSTNAME" \
+      "export SSH_SERVER_PORT=$SSH_SERVER_PORT 2>/dev/null || \
+        setenv SSH_SERVER_PORT $SSH_SERVER_PORT; \
+        sh"
   fi
 
   if ! grep --quiet "Host $SERVER_HOSTNAME" ~/.ssh/config; then
@@ -68,7 +104,11 @@ Host $SERVER_HOSTNAME
 EOF
   fi
 
-  cat $CANDALF_ROOT/lib/bootstrap-remote.sh | ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT 2>/dev/null || setenv CANDALF_ROOT $CANDALF_REMOTE_ROOT; sh -"
+  cat $CANDALF_ROOT/lib/bootstrap-remote.sh | \
+    ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" \
+    "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT 2>/dev/null || \
+      setenv CANDALF_ROOT $CANDALF_REMOTE_ROOT; \
+      sh"
 }
 
 kill_ssh_agent() {

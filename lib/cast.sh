@@ -35,7 +35,12 @@ function cast_as() {
   rsync -Rac lib/cast.sh "$SPELL_FILE" "/home/$CAST_USER/$CANDALF_DIR_NAME"
   cd
 
-  su - "$CAST_USER" -c "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"; export VERBOSE=$VERBOSE; . $CANDALF_DIR_NAME/lib/cast.sh; cast $SPELL_FILE'"
+  su - "$CAST_USER" -c \
+    "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
+      CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"; \
+      export VERBOSE=$VERBOSE; \
+      . $CANDALF_DIR_NAME/lib/cast.sh; \
+      cast $SPELL_FILE'"
 }
 
 function _cast() {
