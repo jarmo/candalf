@@ -28,7 +28,7 @@ manually in case of any problems.
 * Spells are **cast only once** and cast again only when the spell file itself has been changed;
 * It's **blazing fast** since only changed spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
 * Any shell is supported since spells are executed using their **shebang** line;
-* Very easy to understand what Candalf does exactly since it is implemented as **~150 lines** of shell scripts;
+* Very easy to understand what Candalf does exactly since it is implemented as a **few hundred lines** of shell scripts;
 * Supports **Ubuntu** (Debian Linux) and **FreeBSD** (Unix-like) OS-es out of the box, but adding support to a new Linux/Unix-like OS is pretty easy too.
 
 
