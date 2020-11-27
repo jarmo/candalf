@@ -1,8 +1,8 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -Eeuo pipefail
 VERBOSE="${VERBOSE:-""}"
-if [ "$VERBOSE" != "" ]; then set -x; fi
+if [[ "$VERBOSE" != "" ]]; then set -x; fi
 
 CANDALF_REMOTE_ROOT='~/.candalf'
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
@@ -22,8 +22,7 @@ candalf() {
     "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
       export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
       export VERBOSE=$VERBOSE; \
-      $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1 | \
-        tee -a /var/log/candalf.log'" 
+      $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1' | tee -a /var/log/candalf.log" 
 }
 
 bootstrap() {
@@ -35,7 +34,7 @@ bootstrap() {
   SSH_KEY_LABEL=$USERNAME@$HOSTNAME
   SSH_KEY_PATH=~/.ssh/$SERVER_HOSTNAME
 
-  if [ ! -f "$SSH_KEY_PATH" ]; then
+  if [[ ! -f "$SSH_KEY_PATH" ]]; then
     echo "Trying to login to $SERVER_HOSTNAME by using root password"
 
     ssh $SSH_OUTPUT_FLAG -tt \
@@ -112,5 +111,5 @@ EOF
 }
 
 kill_ssh_agent() {
-  [ "$SSH_AGENT_PID" ] && kill $SSH_AGENT_PID
+  [[ "$SSH_AGENT_PID" ]] && kill $SSH_AGENT_PID
 }

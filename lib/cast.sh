@@ -31,13 +31,15 @@ function cast_as() {
   SPELL_FILE="${2:?"SPELL_FILE not set!"}"
   CANDALF_ROOT=${CANDALF_ROOT:="."}
   CANDALF_DIR_NAME=$(basename $CANDALF_ROOT)
+  USER_CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"
   cd $CANDALF_ROOT
-  rsync -Rac lib/cast.sh "$SPELL_FILE" "/home/$CAST_USER/$CANDALF_DIR_NAME"
+  rsync -Rac lib/cast.sh "$SPELL_FILE" "$USER_CANDALF_ROOT"
+  chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
   cd
 
   su - "$CAST_USER" -c \
     "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
-      CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"; \
+      CANDALF_ROOT="$USER_CANDALF_ROOT"; \
       export VERBOSE=$VERBOSE; \
       . $CANDALF_DIR_NAME/lib/cast.sh; \
       cast $SPELL_FILE'"

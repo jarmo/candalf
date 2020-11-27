@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -Eeuo pipefail
+set -Eeu
 VERBOSE="${VERBOSE:-""}"
 if [ "$VERBOSE" != "" ]; then set -x; fi
 
