@@ -259,6 +259,56 @@ Notice that instead of using function `cast` we need to use function called
 difference between applying spells to the `root` or to the specific user.
 
 
+## Handling Secrets
+
+There is no built-in way of handling secrets when using Candalf.
+However, since everything is a shell script then you can use whatever you want
+to handle sensitive data!
+
+Here's an example of using [encpipe](https://github.com/jedisct1/encpipe),
+a really simple tool for symmetric key encryption/decryption.
+
+First, let's create our encrypted data:
+```bash
+echo "some secret thing" | encpipe -e -p "encryption password" | base64 -w0
+```
+
+Output of this command will be a base64 encoded encrypted secret which you can
+safely commit to VCS. You need to remember `encryption password` since this is
+needed when applying spell in the future.
+
+Let's create the relevant spell for using that encrypted data:
+```bash
+cat << 'EOF' > spells/secret.sh
+
+#!/usr/bin/env bash 
+
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [[ "$VERBOSE" != "" ]]; then set -x; fi
+
+read -rsp "Enter secrets password: " PASSWORD
+echo
+
+SECRET=$(echo "EgAAAHHp8AQhiyZqSU6ZgZg3fez34hMVI5C1OWBuo/YaWEhmfXr2eJUp1stS9qAsjDw9zQ4CdhfWjwAAAAANbk3myi1vpG2JR3wlBwcj6qob9f0HSmnjwOq0G2Kr+IUnTQg=" | \
+  base64 -d | \
+  encpipe -d -p "$PASSWORD")
+echo "Decrypted: $SECRET"
+EOF
+```
+
+Let's add it to our spell-book and cast it as any other spell:
+```bash
+echo "cast spells/secret.sh" >> example.org.sh
+
+candalf example.org.sh
+```
+
+When this spell gets cast, then you will be asked for the encryption password.
+In this example we just print out the decrypted data, but in the real world you
+can do whatever you need to do with that data.
+
+
 ## Best Practices
 
 * Write spell scripts like you would write database migrations - keep in
