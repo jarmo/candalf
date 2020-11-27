@@ -378,11 +378,23 @@ When this doesn't help or you need to understand what has happened to the
 system over time you can look into server's `/var/log/candalf.log` where all
 the casted spells and attempts of casting any spells have been logged.
 
-To see all the casted spells in the past then look into the server `~/.candalf/spells`
+To see all the casted spells in the past look into the server `~/.candalf/spells`
 directory - there are spells with extension `.current` which include the latest
 cast spell script and then spells with `.YYYYmmddHHMMSS` extension, which are
 spells applied in the past. Timestamp extension reflects the time when that
 spell was replaced by a new one and not a time when it was cast.
+
+
+## Forcing of Casting a Spell
+
+Sometimes there is a need to cast some alrady casted spell again. It can be
+done by removing a `.current` file in the server. For example, let's imagine
+that a spell `spells/system/upgrade.sh` should be cast again. Run the following
+commands to do it:
+```bash
+ssh example.org "rm -f .candalf/spells/system/upgrade.sh.current"
+candalf example.org
+```
 
 
 ## License
