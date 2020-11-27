@@ -259,6 +259,27 @@ Notice that instead of using function `cast` we need to use function called
 difference between applying spells to the `root` or to the specific user.
 
 
+## Using Different Shells
+
+It's possible to write spells and spell-book scripts in whatever shell you
+prefer - just use appropriate [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
+line at the top of your scripts and that shell will be used. This flexibility
+also means that you can use multiple shells between different spell scripts!
+
+For example, here's how you would use Zsh instead of Bash:
+```
+cat << 'EOF' > spells/zsh.sh
+#!/usr/bin/env zsh
+
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [[ "$VERBOSE" != "" ]]; then set -x; fi
+
+echo $SHELL
+EOF
+```
+
+
 ## Handling Secrets
 
 There is no built-in way of handling secrets when using Candalf.
