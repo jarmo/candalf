@@ -53,10 +53,9 @@ First, clone Candalf itself:
 git clone https://github.com/jarmo/candalf.git
 ```
 
-Create two symlinks into some directory in your `$PATH`, for example:
+Create a symlink into some directory in your `$PATH`, for example:
 ```bash
 sudo ln -s $(realpath candalf/candalf.sh) /usr/local/bin/candalf
-sudo ln -s $(realpath candalf/candalf-local.sh) /usr/local/bin/candalf-local
 ```
 
 Create a separate project/directory for your server spell scripts:
@@ -340,13 +339,13 @@ It's also possible to cast spells to the local system. It might be useful for
 setting up your own machine.
 
 To do this you simply need to cast your spells with
-running `candalf-local` instead of `candalf`:
+running `candalf` with a flag `--local`:
 ```bash
-candalf-local local.sh
+candalf --local local.sh
 ```
 
-Running `candalf-local` requires **root** permissions so prefix it with `sudo` when
-necessary. Everything else is the same as running `candalf` to cast spells to
+Running `candalf` requires **root** permissions so prefix it with `sudo` when
+necessary. Everything else is the same as running `candalf` regularly to cast spells to
 remote systems via SSH.
 
 
