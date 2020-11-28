@@ -279,6 +279,10 @@ echo $SHELL
 EOF
 ```
 
+This behavior adds a flexibility where some spell might install your favorite
+shell to the system and then all the spells coming after it can already use
+that shell.
+
 
 ## Handling Secrets
 
@@ -301,7 +305,6 @@ needed when applying spell in the future.
 Let's create the relevant spell for using that encrypted data:
 ```bash
 cat << 'EOF' > spells/secret.sh
-
 #!/usr/bin/env bash 
 
 set -Eeuo pipefail
@@ -385,16 +388,70 @@ spells applied in the past. Timestamp extension reflects the time when that
 spell was replaced by a new one and not a time when it was cast.
 
 
-## Forcing of Casting a Spell
+### Re-Casting a Spell
 
 Sometimes there is a need to cast some alrady casted spell again. It can be
 done by removing a `.current` file in the server. For example, let's imagine
 that a spell `spells/system/upgrade.sh` should be cast again. Run the following
 commands to do it:
 ```bash
-ssh example.org "rm -f .candalf/spells/system/upgrade.sh.current"
-candalf example.org
+ssh example.org "rm -f .candalf/spells/system/upgrade.sh.current" && \
+  candalf example.org
 ```
+
+### Casting Spells Manually
+
+It might happen that spell will be cast half-way through and cannot be cast anymore
+due to destructive commands in the beginning of a spell script. Here's one example:
+```bash
+cat << 'EOF' > spells/command.sh
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+VERBOSE="${VERBOSE:-""}"
+if [[ "$VERBOSE" != "" ]]; then set -x; fi
+
+mkdir foo
+
+wrong-command
+EOF
+```
+
+When trying to cast this spell we will get an error message:
+```bash
+wrong-command: command not found
+```
+
+Now, if we fix that spell by replacing `wrong-command` with a correct one and
+try to cast this spell again, we will get another error:
+```bash
+mkdir: cannot create directory ‘foo’: File exists
+```
+
+One way to fix this situation would be to add some guard statements around
+destructive commands (or `mkdir -p` for this particular case), however it might
+not be the best solution because it might hide some problems when applying
+spells to a clean machine (maybe if that directory `foo` already exists hints at some
+problem since it has been created by something else, which should not have
+happened in the first place?).
+
+To solve this situation I would recommend running commands manually and then
+set that spell as cast to Candalf so that it would think that it has been
+successfully done.
+
+In this particular case I would run correct command manually in the server and then tell Candalf that
+this spell has been already cast:
+```bash
+SPELL=spells/broken.sh
+cat $SPELL | ssh example.org "cd .candalf && (\
+    [ -f $SPELL.current ] && mv -f $SPELL.current $SPELL.$(date +"%Y%m%d%H%M%S");
+    cat > $SPELL && cp $SPELL $SPELL.current \
+  )"
+```
+
+However, using a solution like this should be the last resort. Use a VM for
+testing and its snapshot functionality to avoid situations like this in the
+first place!
 
 
 ## License
