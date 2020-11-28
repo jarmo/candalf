@@ -7,7 +7,7 @@ if [ "$VERBOSE" != "" ]; then set -x; fi
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
   cd
-  CANDALF_ROOT=${CANDALF_ROOT:="."}
+  CANDALF_ROOT=${CANDALF_ROOT:?"CANDALF_ROOT not set!"}
   SPELL_PATH="$(realpath "$CANDALF_ROOT/$SPELL_FILE")"
   log "Casting spell $SPELL_PATH as the user $USER"
   if [[ -f "$SPELL_PATH.current" ]]; then
@@ -38,8 +38,7 @@ function cast_as() {
   cd
 
   su - "$CAST_USER" -c \
-    "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
-      CANDALF_ROOT="$USER_CANDALF_ROOT"; \
+    "bash -c 'CANDALF_ROOT="$USER_CANDALF_ROOT"; \
       export VERBOSE=$VERBOSE; \
       . $CANDALF_DIR_NAME/lib/cast.sh; \
       cast $SPELL_FILE'"
