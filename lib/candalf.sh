@@ -19,8 +19,7 @@ candalf() {
     -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
 
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
-    "bash -c 'export SERVER_HOSTNAME=$SERVER_HOSTNAME; \
-      export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
+    "bash -c 'export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
       export VERBOSE=$VERBOSE; \
       $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1' | tee -a /var/log/candalf.log" 
 }
@@ -75,7 +74,7 @@ bootstrap() {
   fi    
 
   if ! nc -z "$SERVER_HOSTNAME" $SSH_SERVER_PORT; then
-    cat $CANDALF_ROOT/lib/sshd-remote.sh | \
+    cat $CANDALF_ROOT/lib/sshd.sh | \
       ssh $SSH_OUTPUT_FLAG \
       -o PubkeyAuthentication=yes \
       -o PasswordAuthentication=no \
@@ -103,7 +102,7 @@ Host $SERVER_HOSTNAME
 EOF
   fi
 
-  cat $CANDALF_ROOT/lib/bootstrap-remote.sh | \
+  cat $CANDALF_ROOT/lib/bootstrap.sh | \
     ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" \
     "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT 2>/dev/null || \
       setenv CANDALF_ROOT $CANDALF_REMOTE_ROOT; \

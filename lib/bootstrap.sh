@@ -4,7 +4,7 @@ set -Eeu
 VERBOSE="${VERBOSE:-""}"
 if [ "$VERBOSE" != "" ]; then set -x; fi
 
-mkdir -p $CANDALF_ROOT/lib
+mkdir -p $HOME/.candalf/lib
 mkdir -p /var/log
 touch /var/log/candalf.log
 chmod 640 /var/log/candalf.log
