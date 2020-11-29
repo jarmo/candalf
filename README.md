@@ -341,11 +341,11 @@ setting up your own machine.
 To do this you simply need to cast your spells with
 running `candalf` with a flag `--local`:
 ```bash
-candalf --local local.sh
+sudo -H candalf --local local.sh
 ```
 
-Running `candalf` requires **root** permissions so prefix it with `sudo` when
-necessary. Everything else is the same as running `candalf` regularly to cast spells to
+Running `candalf` requires **root** permissions so prefix it with `sudo -H` when
+not running as a root. Everything else is the same as running `candalf` regularly to cast spells to
 remote systems via SSH.
 
 
