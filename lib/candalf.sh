@@ -8,25 +8,25 @@ CANDALF_REMOTE_ROOT='~/.candalf'
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
 
 candalf() {
-  SERVER_CANDALF_FILE="${1:?"server candalf file not set!"}"
-  SERVER_HOSTNAME=$(basename $SERVER_CANDALF_FILE | rev | cut -d "." -f2- | rev)
+  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
+  SERVER_HOSTNAME=$(basename $SPELL_BOOK | rev | cut -d "." -f2- | rev)
 
   rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh -e "ssh -q" \
     $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib/cast.sh
 
-  rsync $SSH_OUTPUT_FLAG -Rac $SERVER_CANDALF_FILE \
-    $(grep -E "^cast.*\.sh" $SERVER_CANDALF_FILE | rev | awk '{print $1}' | rev) \
+  rsync $SSH_OUTPUT_FLAG -Rac $SPELL_BOOK \
+    $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
     -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
 
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
     "bash -c 'export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
       export VERBOSE=$VERBOSE; \
-      $CANDALF_REMOTE_ROOT/$SERVER_CANDALF_FILE 2>&1' | tee -a /var/log/candalf.log" 
+      $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log" 
 }
 
 bootstrap() {
-  SERVER_CANDALF_FILE="${1:?"server candalf file not set!"}"
-  SERVER_HOSTNAME=$(basename $SERVER_CANDALF_FILE | rev | cut -d "." -f2- | rev)
+  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
+  SERVER_HOSTNAME=$(basename $SPELL_BOOK | rev | cut -d "." -f2- | rev)
 
   HOSTNAME=$(hostname -s 2>/dev/null || hostname -f)
   USERNAME=$(id -un)

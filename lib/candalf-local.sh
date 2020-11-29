@@ -8,17 +8,17 @@ CANDALF_REMOTE_ROOT=$HOME/.candalf
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
 
 candalf() {
-  CANDALF_FILE="${1:?"CANDALF_FILE not set!"}"
+  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
 
   rsync -ac $CANDALF_ROOT/lib/cast.sh $CANDALF_REMOTE_ROOT/lib/cast.sh
 
-  rsync -Rac $CANDALF_FILE \
-    $(grep -E "^cast.*\.sh" $CANDALF_FILE | rev | awk '{print $1}' | rev) \
+  rsync -Rac $SPELL_BOOK \
+    $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
     $CANDALF_REMOTE_ROOT
 
   bash -c "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
     export VERBOSE=$VERBOSE; \
-    $CANDALF_REMOTE_ROOT/$CANDALF_FILE 2>&1" | tee -a /var/log/candalf.log
+    $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1" | tee -a /var/log/candalf.log
 }
 
 bootstrap() {

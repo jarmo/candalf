@@ -2,7 +2,7 @@
 
 usage() {
   echo "
-Usage: $(basename "$0") [-l | --local] [-v | --verbose] SPELL_BOOK_FILE
+Usage: $(basename "$0") [-l | --local] [-v | --verbose] SPELL_BOOK
 
 Options:
   -l --local     apply spells to the local machine
@@ -10,8 +10,8 @@ Options:
   -h --help      show this help
 
 Examples:
-  candalf example.org
-  candalf --local example.org"
+  candalf example.org.sh
+  candalf --local example.org.sh"
   exit 1
 }
 
@@ -70,11 +70,11 @@ else
   . $CANDALF_ROOT/lib/candalf.sh
 fi
 
-CANDALF_FILE=${1:?"SPELL_BOOK_FILE not set!"}
+SPELL_BOOK=${1:?"SPELL_BOOK not set!"}
 
-bootstrap "$CANDALF_FILE"
+bootstrap "$SPELL_BOOK"
 
-echo -e "Applying spells from $CANDALF_FILE\n"
-candalf "$CANDALF_FILE"
-echo "Applying spells from $CANDALF_FILE completed"
+echo -e "Applying spells from $SPELL_BOOK\n"
+candalf "$SPELL_BOOK"
+echo "Applying spells from $SPELL_BOOK completed"
 
