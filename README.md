@@ -363,7 +363,7 @@ does everything split it into multiple smaller logical ones.
 book script and no spells are cast after the failing one.
 
 * When casting of a spell fails then pay close attention at what step did it fail
-because all previously executed commands will be executed again.
+because all previously executed commands will be executed again on retry.
 
 * Make sure that if you need to change any already cast spell scripts then pay
 extra attention to any commands which should not be executed ever more than
