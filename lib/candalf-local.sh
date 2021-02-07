@@ -5,7 +5,7 @@ test $VERBOSE && set -x
 set -Eeuo pipefail
 
 CANDALF_REMOTE_ROOT=$HOME/.candalf
-SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
+SSH_OUTPUT_FLAG=$(test $VERBOSE && echo "-q" || echo "-v")
 
 candalf() {
   SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
