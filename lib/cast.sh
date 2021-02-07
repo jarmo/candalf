@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
 VERBOSE="${VERBOSE:-""}"
-if [ "$VERBOSE" != "" ]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeuo pipefail
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"

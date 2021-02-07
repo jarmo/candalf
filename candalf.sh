@@ -57,9 +57,9 @@ while getopts "$optspec" optchar; do
 done
 shift $((OPTIND-1))
 
-set -Eeuo pipefail
 VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeuo pipefail
 
 CANDALF_ROOT=$(dirname $(realpath $0))
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-set -Eeu
 VERBOSE="${VERBOSE:-""}"
-if [ "$VERBOSE" != "" ]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeu
 
 compat_sed() {
   SUBSITUTION_CMD="$1"

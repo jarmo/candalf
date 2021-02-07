@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
 VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeuo pipefail
 
 CANDALF_REMOTE_ROOT='~/.candalf'
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
