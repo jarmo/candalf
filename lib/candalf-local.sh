@@ -16,9 +16,8 @@ candalf() {
     $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
     $CANDALF_REMOTE_ROOT
 
-  bash -c "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
-    export VERBOSE=$VERBOSE; \
-    $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1" | tee -a /var/log/candalf.log
+    bash -c "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT VERBOSE=$VERBOSE \
+      $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1" | tee -a /var/log/candalf.log
 }
 
 bootstrap() {

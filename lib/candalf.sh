@@ -19,8 +19,7 @@ candalf() {
     -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
 
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
-    "bash -c 'export CANDALF_ROOT=$CANDALF_REMOTE_ROOT; \
-      export VERBOSE=$VERBOSE; \
+    "bash -c 'env CANDALF_ROOT=$CANDALF_REMOTE_ROOT VERBOSE=$VERBOSE \
       $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log" 
 }
 
@@ -82,9 +81,7 @@ bootstrap() {
       -o PreferredAuthentications=publickey \
       -i "$SSH_KEY_PATH" \
       root@"$SERVER_HOSTNAME" \
-      "export SSH_SERVER_PORT=$SSH_SERVER_PORT 2>/dev/null || \
-        setenv SSH_SERVER_PORT $SSH_SERVER_PORT; \
-        sh"
+      "env SSH_SERVER_PORT=$SSH_SERVER_PORT sh"
   fi
 
   if ! grep --quiet "Host $SERVER_HOSTNAME" ~/.ssh/config; then
@@ -104,11 +101,9 @@ EOF
 
   cat $CANDALF_ROOT/lib/bootstrap.sh | \
     ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" \
-    "export CANDALF_ROOT=$CANDALF_REMOTE_ROOT 2>/dev/null || \
-      setenv CANDALF_ROOT $CANDALF_REMOTE_ROOT; \
-      sh"
+    "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT sh"
 }
 
 kill_ssh_agent() {
-  [[ "$SSH_AGENT_PID" ]] && kill $SSH_AGENT_PID
+  test "$SSH_AGENT_PID" && kill $SSH_AGENT_PID
 }
