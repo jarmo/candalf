@@ -7,6 +7,9 @@ set -Eeuo pipefail
 CANDALF_REMOTE_ROOT=$HOME/.candalf
 SSH_OUTPUT_FLAG=$(test $VERBOSE && echo "-q" || echo "-v")
 
+. $CANDALF_ROOT/lib/candalf-env.sh
+eval $(candalfEnv)
+
 candalf() {
   SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
 
@@ -16,7 +19,7 @@ candalf() {
     $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
     $CANDALF_REMOTE_ROOT
 
-    bash -c "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT VERBOSE=$VERBOSE \
+    env "${candalfEnvVars[@]-}" bash -c "CANDALF_ROOT=$CANDALF_REMOTE_ROOT VERBOSE=$VERBOSE \
       $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1" | tee -a /var/log/candalf.log
 }
 

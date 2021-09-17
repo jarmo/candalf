@@ -4,23 +4,25 @@ VERBOSE="${VERBOSE:-""}"
 test $VERBOSE && set -x
 set -Eeuo pipefail
 
-CANDALF_REMOTE_ROOT='~/.candalf'
+CANDALF_REMOTE_ROOT='$HOME/.candalf'
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
+
+. $CANDALF_ROOT/lib/candalf-env.sh
+eval $(candalfEnv)
 
 candalf() {
   SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
   SERVER_HOSTNAME=$(basename $SPELL_BOOK | rev | cut -d "." -f2- | rev)
 
-  rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh -e "ssh -q" \
-    $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib/cast.sh
+  rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh $CANDALF_ROOT/lib/candalf-env.sh -e "ssh -q" \
+    $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib
 
   rsync $SSH_OUTPUT_FLAG -Rac $SPELL_BOOK \
     $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
     -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
 
   ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
-    "bash -c 'env CANDALF_ROOT=$CANDALF_REMOTE_ROOT VERBOSE=$VERBOSE \
-      $CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log" 
+    env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" "bash -c '$CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log"
 }
 
 bootstrap() {

@@ -18,3 +18,4 @@ touch /var/log/candalf.log
 chmod 640 /var/log/candalf.log
 install rsync
 install bash
+install sudo

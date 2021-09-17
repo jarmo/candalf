@@ -4,6 +4,9 @@ VERBOSE="${VERBOSE:-""}"
 test $VERBOSE && set -x
 set -Eeuo pipefail
 
+. $CANDALF_ROOT/lib/candalf-env.sh
+eval $(candalfEnv)
+
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
   cd
@@ -33,15 +36,11 @@ function cast_as() {
   CANDALF_DIR_NAME=$(basename $CANDALF_ROOT)
   USER_CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"
   cd $CANDALF_ROOT
-  rsync -Rac lib/cast.sh "$SPELL_FILE" "$USER_CANDALF_ROOT"
+  rsync -Rac lib/cast.sh lib/candalf-env.sh "$SPELL_FILE" "$USER_CANDALF_ROOT"
   chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
   cd
 
-  su - "$CAST_USER" -c \
-    "bash -c 'CANDALF_ROOT="$USER_CANDALF_ROOT"; \
-      export VERBOSE=$VERBOSE; \
-      . $CANDALF_DIR_NAME/lib/cast.sh; \
-      cast $SPELL_FILE'"
+  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" VERBOSE="$VERBOSE" bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $SPELL_FILE"
 }
 
 function _cast() {
