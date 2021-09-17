@@ -24,7 +24,7 @@ manually in case of any problems.
 
 * Very **easy** to learn and use since the only knowledge required is writing regular `shell` scripts;
 * Very **flexible** - everything you can do manually from command line can be also done with Candalf;
-* Very easy to install since there are no dependencies except a **shell** and Candalf itself;
+* Very easy to install since there are no dependencies except a **shell** and Candalf scripts themselves;
 * Spells are **cast only once** and cast again only when the spell file itself has been changed;
 * It's **blazing fast** since only changed spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
 * Any shell is supported since spells are executed using their **shebang** line;
@@ -37,9 +37,10 @@ manually in case of any problems.
 To use Candalf to cast spells to a clean system, the following requirements need to be met:
 
 * System should be running a **supported** OS;
-* SSH server should be running at port **22** and it should be accessible from your machine;
+* SSH server should be running on port **22** and it should be accessible from your machine;
 * Logging in with **root password** over SSH should be allowed and enabled;
-* `rsync` needs to be installed on the current system (it will be installed automatically on the remote system when needed).
+* `rsync` needs to be installed on the current system (it will be installed automatically on the remote system when needed);
+* `bash` needs to be installed on the current system.
 
 When SSH server is running on a non-standard port already and/or password login is
 disabled then it is still possible to use Candalf, but some extra steps
@@ -48,7 +49,7 @@ are needed. See more in [Installation](#installation) section.
 
 ## Installation
 
-First, clone Candalf itself:
+First, clone Candalf itself on your local system:
 ```bash
 git clone https://github.com/jarmo/candalf.git
 ```
@@ -70,9 +71,8 @@ cd example.org
 cat << 'EOF' > spells/now.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 date > ~/now
 EOF
@@ -80,22 +80,20 @@ EOF
 cat << 'EOF' > spells/me.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 id -un > ~/me
 EOF
 ```
 
-Create a script for casting all the spells:
+Create a script for casting all the spells (so-called spell book):
 ```bash
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 . ${CANDALF_ROOT:="."}/lib/cast.sh
 
@@ -154,16 +152,16 @@ all necessary dependencies and configuring them as you would do manually.
 Good practice would be not to do any changes manually on the remote system, but
 only use spell files and keep these in the VCS too for having a better understanding
 of the remote system (and for a good disaster recovery/scaling reasons).
-You should think of a remote system being a read-only system when it comes to installing new packages or configuring anything there.
+You should think of a remote system being a read-only system when it comes to installing new packages
+or configuring anything there manually.
 
-Spell book script of a server is pretty simple. Let's create one without any spells in it:
+Spell book script of a server is a pretty simple one. Let's create one without any spells in it:
 ```bash
 cat << 'EOF' > example.org.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 . ${CANDALF_ROOT:="."}/lib/cast.sh
 EOF
@@ -177,7 +175,7 @@ and `lib/cast.sh` is sourced so that a few Candalf helper functions could be use
 One important thing to notice here is that the name of the spell book script
 file has to match the domain name of the server you want to cast all the spells.
 
-Now, adding spells to the spell book script is really easy too - just need
+Now, adding spells to the spell book script is really easy too - you just need
 to execute function `cast` with a parameter to spell file. Spell files
 can be placed anywhere but the argument to `cast` function should have
 a relative path from the spell book script to the file.
@@ -194,20 +192,19 @@ mkdir -p spells/system
 cat << 'EOF' > spells/system/upgrade.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 apt update -y
 apt upgrade -y
 EOF
 ```
 
-Again pretty straightforward - standard boiler-place code in the header of the
+Again pretty straightforward - standard boiler-plate code in the header of the
 script and then the important part of running `apt` commands for upgrading the system packages.
 It's always a good idea to do this on a new system before doing anything else.
 
-Let's add this spell into our spell book script otherwise it will not be cast:
+Let's add this spell into our spell book script, otherwise it will not be cast:
 ```bash
 echo "cast spells/system/upgrade.sh" >> example.org.sh
 ```
@@ -220,7 +217,7 @@ candalf example.org.sh
 
 If everything goes well then a SSH key is going to be created, it will be
 copied to the server, SSH server will be running on a random port and password
-authentication via SSH server is disabled. There will be also a lot of output
+authentication via SSH server will be disabled. There will be also a lot of output
 from apt upgrading the system.
 
 If you run the same command again then not much happens because Candalf has
@@ -242,9 +239,8 @@ mkdir -p spells/john
 cat << 'EOF' > spells/john/whoami.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 whoami
 EOF
@@ -254,15 +250,15 @@ echo "cast_as john spells/john/whoami.sh" >> example.org.sh
 candalf example.org.sh
 ```
 
-Notice that instead of using function `cast` we need to use function called
+Notice that instead of using the function `cast` we need to use the function called
 `cast_as` with a user name parameter and a spell path. That's the only
-difference between applying spells to the `root` or to the specific user.
+difference between applying spells to the `root` or to a specific user.
 
 
 ## Using Different Shells
 
 It's possible to write spells and spell-book scripts in whatever shell you
-prefer - just use appropriate [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
+prefer - just use an appropriate [shebang](https://en.wikipedia.org/wiki/Shebang_(Unix))
 line at the top of your scripts and that shell will be used. This flexibility
 also means that you can use multiple shells between different spell scripts!
 
@@ -271,9 +267,8 @@ For example, here's how you would use Zsh instead of Bash:
 cat << 'EOF' > spells/zsh.sh
 #!/usr/bin/env zsh
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 echo $SHELL
 EOF
@@ -307,9 +302,8 @@ Let's create the relevant spell for using that encrypted data:
 cat << 'EOF' > spells/secret.sh
 #!/usr/bin/env bash 
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 read -rsp "Enter secrets password: " PASSWORD
 echo
@@ -332,6 +326,43 @@ When this spell gets cast, then you will be asked for the encryption password.
 In this example we just print out the decrypted data, but in the real world you
 can do whatever you need to do with that data.
 
+Don't forget to create a spell script for installing encpipe to the remote system
+too!
+
+
+## Environment Variables
+
+Candalf supports passing environment variables to the remote system too.
+However, not all variables are passed due to security and/or system integrity
+reasons. Only variables starting with a prefix of `CANDALF_` are supported.
+Here's an example of how you can pass a password for decryption of the secrets
+instead of entering it from a prompt (read from [Handling Secrets](#handling-secrets)).
+
+Let's modify our secret spell file:
+```bash
+cat << 'EOF' > spells/secret.sh
+#!/usr/bin/env bash 
+
+test $VERBOSE && set -x
+set -Eeo pipefail
+
+CANDALF_PASSWORD="${CANDALF_PASSWORD:?"CANDALF_PASSWORD is missing!"}"
+
+SECRET=$(echo "EgAAAHHp8AQhiyZqSU6ZgZg3fez34hMVI5C1OWBuo/YaWEhmfXr2eJUp1stS9qAsjDw9zQ4CdhfWjwAAAAANbk3myi1vpG2JR3wlBwcj6qob9f0HSmnjwOq0G2Kr+IUnTQg=" | \
+  base64 -d | \
+  encpipe -d -p "$CANDALF_PASSWORD")
+echo "Decrypted: $SECRET"
+EOF
+```
+
+Note that instead of using `read` we now pass password to the `encpipe` via an
+envionrment variable `$CANDALF_PASSWORD`. It is also a good practice to bail
+out early with an error when that environment variable has not been set.
+
+Now, to execute candalf just specify password on the command line like this:
+```
+CANDALF_PASSWORD="encryption password" candalf example.org.sh
+```
 
 ## Casting Spells Locally
 
@@ -359,13 +390,13 @@ will be _committed_ which means that Candalf will not cast it again.
 and as specific as possible - instead of having one big spell script which
 does everything split it into multiple smaller logical ones.
 
-* Keep in mind that spells are applied in the order of definition in the spell
-book script and no spells are cast after the failing one.
+* Keep in mind that spells are applied in the order of declaration in the spell
+book script and no spells are cast after one fails.
 
 * When casting of a spell fails then pay close attention at what step did it fail
-because all previously executed commands will be executed again on retry.
+because all previously executed commands in that spell script will be executed again on retry.
 
-* Make sure that if you need to change any already cast spell scripts then pay
+* When you need to change any spell script which has been already cast then pay
 extra attention to any commands which should not be executed ever more than
 once - maybe adding some extra `if` statement guard around these is good
 enough.
@@ -423,9 +454,8 @@ due to destructive commands in the beginning of a spell script. Here's one examp
 cat << 'EOF' > spells/command.sh
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
-VERBOSE="${VERBOSE:-""}"
-if [[ "$VERBOSE" != "" ]]; then set -x; fi
+test $VERBOSE && set -x
+set -Eeo pipefail
 
 mkdir foo
 
@@ -465,7 +495,7 @@ cat $SPELL | ssh example.org "cd .candalf && (\
   )"
 ```
 
-However, using a solution like this should be the last resort. Use a VM for
+However, using a solution like this should be a very last resort. Use a VM for
 testing and its snapshot functionality to avoid situations like this in the
 first place!
 
