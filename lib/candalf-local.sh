@@ -10,7 +10,7 @@ CANDALF_REMOTE_ROOT=$HOME/.candalf
 eval "$(candalfEnv)"
 
 candalf() {
-  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
+  SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
 
   rsync -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_REMOTE_ROOT"/lib/cast.sh
 

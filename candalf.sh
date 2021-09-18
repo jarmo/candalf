@@ -2,16 +2,15 @@
 
 usage() {
   echo "
-Usage: $(basename "$0") [-l | --local] [-v | --verbose] SPELL_BOOK
+Usage: $(basename "$0") [-v | --verbose] SERVER SPELL_BOOK
 
 Options:
-  -l --local     apply spells to the local machine
   -v --verbose   enable verbose output
   -h --help      show this help
 
 Examples:
-  candalf example.org.sh
-  candalf --local example.org.sh"
+  candalf example.org book.sh
+  candalf localhost book.sh"
   exit 1
 }
 
@@ -24,9 +23,6 @@ while getopts "$optspec" optchar; do
   case "${optchar}" in
     -)
       case "${OPTARG}" in
-        local)
-          LOCAL=1
-          ;;
         verbose)
           VERBOSE=1
           ;;
@@ -62,19 +58,18 @@ test $VERBOSE && set -x
 set -Eeuo pipefail
 
 CANDALF_ROOT=$(dirname "$(realpath "$0")")
+CANDALF_SERVER=${1:?"SERVER not set!"}
+SPELL_BOOK=${2:?"SPELL_BOOK not set!"}
 
-LOCAL="${LOCAL:-""}"
-if [[ "$LOCAL" != "" ]]; then
+if [[ "$CANDALF_SERVER" = "localhost" || "$CANDALF_SERVER" = "127.0.0.1" ]]; then
   . "$CANDALF_ROOT"/lib/candalf-local.sh
 else
   . "$CANDALF_ROOT"/lib/candalf.sh
 fi
 
-SPELL_BOOK=${1:?"SPELL_BOOK not set!"}
-
-bootstrap "$SPELL_BOOK"
+bootstrap "$CANDALF_SERVER" "$SPELL_BOOK"
 
 echo -e "Applying spells from $SPELL_BOOK\n"
-candalf "$SPELL_BOOK"
+candalf "$CANDALF_SERVER" "$SPELL_BOOK"
 echo "Applying spells from $SPELL_BOOK completed"
 

@@ -12,39 +12,38 @@ SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
 eval "$(candalfEnv)"
 
 candalf() {
-  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
-  SERVER_HOSTNAME=$(basename "$SPELL_BOOK" | rev | cut -d "." -f2- | rev)
+  CANDALF_SERVER="${1:?"CANDALF_SERVER not set!"}"
+  SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
 
   rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q" \
-    "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT/lib
+    "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
-  # shellcheck disable=SC2046
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
-    -e "ssh $SSH_OUTPUT_FLAG" "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT
+    -e "ssh $SSH_OUTPUT_FLAG" "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT
 
   # shellcheck disable=SC2154,SC2029
-  ssh "$SSH_OUTPUT_FLAG" -tt "$SERVER_HOSTNAME" \
+  ssh "$SSH_OUTPUT_FLAG" -tt "$CANDALF_SERVER" \
     env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" "bash -c '$CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log"
 }
 
 bootstrap() {
-  SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
-  SERVER_HOSTNAME=$(basename "$SPELL_BOOK" | rev | cut -d "." -f2- | rev)
+  CANDALF_SERVER="${1:?"CANDALF_SERVER not set!"}"
+  SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
 
   HOSTNAME=$(hostname -s 2>/dev/null || hostname -f)
   USERNAME=$(id -un)
   SSH_KEY_LABEL=$USERNAME@$HOSTNAME
-  SSH_KEY_PATH=~/.ssh/$SERVER_HOSTNAME
+  SSH_KEY_PATH=~/.ssh/$CANDALF_SERVER
 
   if [[ ! -f "$SSH_KEY_PATH" ]]; then
-    echo "Trying to login to $SERVER_HOSTNAME by using root password"
+    echo "Trying to login to $CANDALF_SERVER by using root password"
 
     ssh "$SSH_OUTPUT_FLAG" -tt \
       -o PubkeyAuthentication=no \
       -o PasswordAuthentication=yes \
       -o IdentitiesOnly=yes \
       -o PreferredAuthentications=password \
-      root@"$SERVER_HOSTNAME" \
+      root@"$CANDALF_SERVER" \
       'echo "Logged successfully into $HOST for the first time, creating key"'
 
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
@@ -61,22 +60,22 @@ bootstrap() {
     -o IdentitiesOnly=yes \
     -o PreferredAuthentications=publickey \
     -i '$SSH_KEY_PATH' \
-    root@'$SERVER_HOSTNAME' 'true'"
+    root@'$CANDALF_SERVER' 'true'"
 
   if ! eval "$SSH_LOGIN_COMMAND" || false; then
-    echo "Failed to login using SSH key, trying to copy key to the $SERVER_HOSTNAME"
-    ssh-copy-id -o IdentitiesOnly=yes -i "$SSH_KEY_PATH" root@"$SERVER_HOSTNAME"
+    echo "Failed to login using SSH key, trying to copy key to the $CANDALF_SERVER"
+    ssh-copy-id -o IdentitiesOnly=yes -i "$SSH_KEY_PATH" root@"$CANDALF_SERVER"
     eval "$SSH_LOGIN_COMMAND"
-    echo "From now on use SSH key $SSH_KEY_PATH for logging into root@$SERVER_HOSTNAME"
+    echo "From now on use SSH key $SSH_KEY_PATH for logging into root@$CANDALF_SERVER"
   fi
 
-  if ! grep --quiet "Host $SERVER_HOSTNAME" ~/.ssh/config; then
+  if ! grep --quiet "Host $CANDALF_SERVER" ~/.ssh/config; then
     SSH_SERVER_PORT=$(shuf -i 13337-65535 -n 1)
   else
-    SSH_SERVER_PORT=$(grep -A 10 "Host $SERVER_HOSTNAME" ~/.ssh/config | grep "Port" | head -1 | cut -d " " -f4)
+    SSH_SERVER_PORT=$(grep -A 10 "Host $CANDALF_SERVER" ~/.ssh/config | grep "Port" | head -1 | cut -d " " -f4)
   fi    
 
-  if ! nc -z "$SERVER_HOSTNAME" "$SSH_SERVER_PORT"; then
+  if ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT"; then
     # shellcheck disable=SC2029
     ssh "$SSH_OUTPUT_FLAG" \
       -o PubkeyAuthentication=yes \
@@ -84,15 +83,15 @@ bootstrap() {
       -o IdentitiesOnly=yes \
       -o PreferredAuthentications=publickey \
       -i "$SSH_KEY_PATH" \
-      root@"$SERVER_HOSTNAME" \
+      root@"$CANDALF_SERVER" \
       "env SSH_SERVER_PORT=$SSH_SERVER_PORT sh" < "$CANDALF_ROOT"/lib/sshd.sh
   fi
 
-  if ! grep --quiet "Host $SERVER_HOSTNAME" ~/.ssh/config; then
+  if ! grep --quiet "Host $CANDALF_SERVER" ~/.ssh/config; then
     cat << EOF >> ~/.ssh/config
 
-Host $SERVER_HOSTNAME
-  Hostname $SERVER_HOSTNAME
+Host $CANDALF_SERVER
+  Hostname $CANDALF_SERVER
   Port $SSH_SERVER_PORT
   User root
   IdentityFile $SSH_KEY_PATH
@@ -104,7 +103,7 @@ EOF
   fi
 
   # shellcheck disable=SC2029
-  ssh "$SSH_OUTPUT_FLAG" "$SERVER_HOSTNAME" \
+  ssh "$SSH_OUTPUT_FLAG" "$CANDALF_SERVER" \
     "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT sh" < "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 

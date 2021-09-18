@@ -89,7 +89,7 @@ EOF
 
 Create a script for casting all the spells (so-called spell book):
 ```bash
-cat << 'EOF' > example.org.sh
+cat << 'EOF' > book.sh
 #!/usr/bin/env bash
 
 test $VERBOSE && set -x
@@ -102,13 +102,9 @@ cast spell/me.sh
 EOF
 ```
 
-PS! File name should be the actual domain name for the server (in this
-case it's `example.org`) because Candalf uses that name to connect to the
-correct server.
-
-Cast all spells to the server:
+Cast all spells to the server at example.org:
 ```bash
-candalf example.org.sh
+candalf example.org book.sh
 ```
 
 During the first run you will be asked a couple of times the root password of the remote system to
@@ -157,7 +153,7 @@ or configuring anything there manually.
 
 Spell book script of a server is a pretty simple one. Let's create one without any spells in it:
 ```bash
-cat << 'EOF' > example.org.sh
+cat << 'EOF' > book.sh
 #!/usr/bin/env bash
 
 test $VERBOSE && set -x
@@ -172,8 +168,6 @@ Bash to be used as a running shell, then a bunch of important `set` commands (re
 the shell manual or
 from [this blog post](https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/) to understand what they're for)
 and `lib/cast.sh` is sourced so that a few Candalf helper functions could be used.
-One important thing to notice here is that the name of the spell book script
-file has to match the domain name of the server you want to cast all the spells.
 
 Now, adding spells to the spell book script is really easy too - you just need
 to execute function `cast` with a parameter to spell file. Spell files
@@ -206,13 +200,13 @@ It's always a good idea to do this on a new system before doing anything else.
 
 Let's add this spell into our spell book script, otherwise it will not be cast:
 ```bash
-echo "cast spells/system/upgrade.sh" >> example.org.sh
+echo "cast spells/system/upgrade.sh" >> book.sh
 ```
 
 Let's cast all the defined spells (we assume that Candalf itself has been installed already
 as specified in the [Installation](#installation) section):
 ```bash
-candalf example.org.sh
+candalf example.org book.sh
 ```
 
 If everything goes well then a SSH key is going to be created, it will be
@@ -245,9 +239,9 @@ set -Eeo pipefail
 whoami
 EOF
 
-echo "cast_as john spells/john/whoami.sh" >> example.org.sh
+echo "cast_as john spells/john/whoami.sh" >> book.sh
 
-candalf example.org.sh
+candalf example.org book.sh
 ```
 
 Notice that instead of using the function `cast` we need to use the function called
@@ -317,9 +311,9 @@ EOF
 
 Let's add it to our spell-book and cast it as any other spell:
 ```bash
-echo "cast spells/secret.sh" >> example.org.sh
+echo "cast spells/secret.sh" >> book.sh
 
-candalf example.org.sh
+candalf example.org book.sh
 ```
 
 When this spell gets cast, then you will be asked for the encryption password.
@@ -361,7 +355,7 @@ out early with an error when that environment variable has not been set.
 
 Now, to execute candalf just specify password on the command line like this:
 ```
-CANDALF_PASSWORD="encryption password" candalf example.org.sh
+CANDALF_PASSWORD="encryption password" candalf example.org book.sh
 ```
 
 ## Casting Spells Locally
@@ -369,15 +363,16 @@ CANDALF_PASSWORD="encryption password" candalf example.org.sh
 It's also possible to cast spells to the local system. It might be useful for
 setting up your own machine.
 
-To do this you simply need to cast your spells with
-running `candalf` with a flag `--local`:
+To do this you simply need to specify `SERVER` parameter as a special parameter `localhost` or `127.0.0.1`:
 ```bash
-sudo -H candalf --local local.sh
+sudo -H candalf localhost book.sh
 ```
 
 Running `candalf` requires **root** permissions so prefix it with `sudo -H` when
 not running as a root. Everything else is the same as running `candalf` regularly to cast spells to
 remote systems via SSH.
+
+SSH server does not need be running to use Candalf on a local system.
 
 
 ## Best Practices
@@ -418,7 +413,7 @@ help you with.
 
 You can enable `VERBOSE` mode by running `candalf` like this:
 ```bash
-candalf -v example.org.sh
+candalf -v example.org book.sh
 ```
 
 Beware that there will be a lot of output, but hopefully you can find the
