@@ -35,9 +35,6 @@ while getopts "$optspec" optchar; do
           fi
           ;;
       esac;;
-    l)
-      LOCAL=1
-      ;;
     v)
       VERBOSE=1
       ;;
