@@ -14,19 +14,23 @@ eval "$(candalfEnv)"
 candalf() {
   CANDALF_SERVER="${1:?"CANDALF_SERVER not set!"}"
   SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
-  SPELL_BOOK_BASENAME="$(basename "$SPELL_BOOK" .sh)"
-  CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME"
+  SPELL_BOOK_DIR="$(dirname "$(realpath "$SPELL_BOOK")")"
+  SPELL_BOOK_BASENAME="$(basename "$SPELL_BOOK")"
+  SPELL_BOOK_BASENAME_WITHOUT_EXT="$(basename "$SPELL_BOOK_BASENAME" .sh)"
+  CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME_WITHOUT_EXT"
 
   rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q" \
     "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
+  cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
     -e "ssh $SSH_OUTPUT_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
+  cd
 
   # shellcheck disable=SC2154,SC2029
   ssh "$SSH_OUTPUT_FLAG" -tt "$CANDALF_SERVER" \
     env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" \
-      "bash -c '$CANDALF_SPELLS_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log"
+      "bash -c '$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME 2>&1' | tee -a /var/log/candalf.log"
 }
 
 bootstrap() {
