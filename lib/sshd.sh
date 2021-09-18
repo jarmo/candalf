@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 VERBOSE="${VERBOSE:-""}"
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeu
 
 compat_sed() {
@@ -9,7 +9,7 @@ compat_sed() {
   EDITED_FILE="$2"
 
   sed -i "$SUBSITUTION_CMD" "$EDITED_FILE" 2>/dev/null || \
-    sed -i "" -e "$SUBSITUTION_CMD" $EDITED_FILE
+    sed -i "" -e "$SUBSITUTION_CMD" "$EDITED_FILE"
 }
 
 echo "Disable password login to SSH server"

@@ -1,18 +1,18 @@
 #!/usr/bin/env sh
 
 VERBOSE="${VERBOSE:-""}"
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeu
 
 install() {
   PACKAGE=$1
-  which $PACKAGE >/dev/null || \
-    (which apt >/dev/null && apt install -y $PACKAGE) || \
-    (which pkg >/dev/null && pkg install -y $PACKAGE) || \
+  which "$PACKAGE" >/dev/null || \
+    (which apt >/dev/null && apt install -y "$PACKAGE") || \
+    (which pkg >/dev/null && pkg install -y "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
 
-mkdir -p $HOME/.candalf/lib
+mkdir -p "$HOME"/.candalf/lib
 mkdir -p /var/log
 touch /var/log/candalf.log
 chmod 640 /var/log/candalf.log

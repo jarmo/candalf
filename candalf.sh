@@ -61,13 +61,13 @@ VERBOSE="${VERBOSE:-""}"
 test $VERBOSE && set -x
 set -Eeuo pipefail
 
-CANDALF_ROOT=$(dirname $(realpath $0))
+CANDALF_ROOT=$(dirname "$(realpath "$0")")
 
 LOCAL="${LOCAL:-""}"
 if [[ "$LOCAL" != "" ]]; then
-  . $CANDALF_ROOT/lib/candalf-local.sh
+  . "$CANDALF_ROOT"/lib/candalf-local.sh
 else
-  . $CANDALF_ROOT/lib/candalf.sh
+  . "$CANDALF_ROOT"/lib/candalf.sh
 fi
 
 SPELL_BOOK=${1:?"SPELL_BOOK not set!"}

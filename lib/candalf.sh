@@ -1,33 +1,36 @@
 #!/usr/bin/env bash
 
 VERBOSE="${VERBOSE:-""}"
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeuo pipefail
 
+# shellcheck disable=SC2016
 CANDALF_REMOTE_ROOT='$HOME/.candalf'
 SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
 
-. $CANDALF_ROOT/lib/candalf-env.sh
-eval $(candalfEnv)
+. "$CANDALF_ROOT"/lib/candalf-env.sh
+eval "$(candalfEnv)"
 
 candalf() {
   SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
-  SERVER_HOSTNAME=$(basename $SPELL_BOOK | rev | cut -d "." -f2- | rev)
+  SERVER_HOSTNAME=$(basename "$SPELL_BOOK" | rev | cut -d "." -f2- | rev)
 
-  rsync $SSH_OUTPUT_FLAG -ac $CANDALF_ROOT/lib/cast.sh $CANDALF_ROOT/lib/candalf-env.sh -e "ssh -q" \
-    $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT/lib
+  rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q" \
+    "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT/lib
 
-  rsync $SSH_OUTPUT_FLAG -Rac $SPELL_BOOK \
-    $(grep -E "^cast.*\.sh" $SPELL_BOOK | rev | awk '{print $1}' | rev) \
-    -e "ssh $SSH_OUTPUT_FLAG" $SERVER_HOSTNAME:$CANDALF_REMOTE_ROOT
+  # shellcheck disable=SC2046
+  rsync "$SSH_OUTPUT_FLAG" -Rac0 "$SPELL_BOOK" \
+    $(grep -ZE "^cast.*\.sh" "$SPELL_BOOK" | rev | awk '{print $1}' | rev) \
+    -e "ssh $SSH_OUTPUT_FLAG" "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT
 
-  ssh $SSH_OUTPUT_FLAG -tt "$SERVER_HOSTNAME" \
+  # shellcheck disable=SC2154,SC2029
+  ssh "$SSH_OUTPUT_FLAG" -tt "$SERVER_HOSTNAME" \
     env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" "bash -c '$CANDALF_REMOTE_ROOT/$SPELL_BOOK 2>&1' | tee -a /var/log/candalf.log"
 }
 
 bootstrap() {
   SPELL_BOOK="${1:?"SPELL_BOOK not set!"}"
-  SERVER_HOSTNAME=$(basename $SPELL_BOOK | rev | cut -d "." -f2- | rev)
+  SERVER_HOSTNAME=$(basename "$SPELL_BOOK" | rev | cut -d "." -f2- | rev)
 
   HOSTNAME=$(hostname -s 2>/dev/null || hostname -f)
   USERNAME=$(id -un)
@@ -37,7 +40,7 @@ bootstrap() {
   if [[ ! -f "$SSH_KEY_PATH" ]]; then
     echo "Trying to login to $SERVER_HOSTNAME by using root password"
 
-    ssh $SSH_OUTPUT_FLAG -tt \
+    ssh "$SSH_OUTPUT_FLAG" -tt \
       -o PubkeyAuthentication=no \
       -o PasswordAuthentication=yes \
       -o IdentitiesOnly=yes \
@@ -50,7 +53,7 @@ bootstrap() {
 
   trap kill_ssh_agent ERR
   trap kill_ssh_agent EXIT
-  eval $(ssh-agent -s) >/dev/null
+  eval "$(ssh-agent -s)" >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 
   SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt \
@@ -74,16 +77,16 @@ bootstrap() {
     SSH_SERVER_PORT=$(grep -A 10 "Host $SERVER_HOSTNAME" ~/.ssh/config | grep "Port" | head -1 | cut -d " " -f4)
   fi    
 
-  if ! nc -z "$SERVER_HOSTNAME" $SSH_SERVER_PORT; then
-    cat $CANDALF_ROOT/lib/sshd.sh | \
-      ssh $SSH_OUTPUT_FLAG \
+  if ! nc -z "$SERVER_HOSTNAME" "$SSH_SERVER_PORT"; then
+    # shellcheck disable=SC2029
+    ssh "$SSH_OUTPUT_FLAG" \
       -o PubkeyAuthentication=yes \
       -o PasswordAuthentication=no \
       -o IdentitiesOnly=yes \
       -o PreferredAuthentications=publickey \
       -i "$SSH_KEY_PATH" \
       root@"$SERVER_HOSTNAME" \
-      "env SSH_SERVER_PORT=$SSH_SERVER_PORT sh"
+      "env SSH_SERVER_PORT=$SSH_SERVER_PORT sh" < "$CANDALF_ROOT"/lib/sshd.sh
   fi
 
   if ! grep --quiet "Host $SERVER_HOSTNAME" ~/.ssh/config; then
@@ -101,11 +104,11 @@ Host $SERVER_HOSTNAME
 EOF
   fi
 
-  cat $CANDALF_ROOT/lib/bootstrap.sh | \
-    ssh $SSH_OUTPUT_FLAG "$SERVER_HOSTNAME" \
-    "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT sh"
+  # shellcheck disable=SC2029
+  ssh "$SSH_OUTPUT_FLAG" "$SERVER_HOSTNAME" \
+    "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT sh" < "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 
 kill_ssh_agent() {
-  test "$SSH_AGENT_PID" && kill $SSH_AGENT_PID
+  test "$SSH_AGENT_PID" && kill "$SSH_AGENT_PID"
 }
