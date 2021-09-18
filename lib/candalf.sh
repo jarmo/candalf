@@ -19,8 +19,7 @@ candalf() {
     "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT/lib
 
   # shellcheck disable=SC2046
-  rsync "$SSH_OUTPUT_FLAG" -Rac0 "$SPELL_BOOK" \
-    $(grep -ZE "^cast.*\.sh" "$SPELL_BOOK" | rev | awk '{print $1}' | rev) \
+  rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
     -e "ssh $SSH_OUTPUT_FLAG" "$SERVER_HOSTNAME":$CANDALF_REMOTE_ROOT
 
   # shellcheck disable=SC2154,SC2029
