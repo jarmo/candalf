@@ -418,7 +418,7 @@ help you with.
 
 You can enable `VERBOSE` mode by running `candalf` like this:
 ```bash
-VERBOSE=1 candalf example.org.sh
+candalf -v example.org.sh
 ```
 
 Beware that there will be a lot of output, but hopefully you can find the
