@@ -11,7 +11,7 @@ function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
   cd
   CANDALF_ROOT=${CANDALF_ROOT:?"CANDALF_ROOT not set!"}
-  SPELL_PATH="$(realpath "$CANDALF_ROOT/$SPELL_FILE")"
+  SPELL_PATH="$(realpath "$CANDALF_SPELLS_ROOT/$SPELL_FILE")"
   log "Casting spell $SPELL_PATH as the user $USER"
   if [[ -f "$SPELL_PATH.current" ]]; then
     if ! diff "$SPELL_PATH".current "$SPELL_PATH"; then
@@ -35,13 +35,18 @@ function cast_as() {
   CANDALF_ROOT=${CANDALF_ROOT:="."}
   CANDALF_DIR_NAME=$(basename "$CANDALF_ROOT")
   USER_CANDALF_ROOT="/home/$CAST_USER/$CANDALF_DIR_NAME"
+  SPELL_BOOK_NAME="$(basename "$CANDALF_SPELLS_ROOT")"
+  USER_CANDALF_SPELLS_ROOT="$USER_CANDALF_ROOT/$SPELL_BOOK_NAME"
   cd "$CANDALF_ROOT"
-  rsync -Rac lib/cast.sh lib/candalf-env.sh "$SPELL_FILE" "$USER_CANDALF_ROOT"
+  mkdir -p "$USER_CANDALF_ROOT/lib"
+  rsync -ac lib/cast.sh lib/candalf-env.sh "$USER_CANDALF_ROOT/lib"
+  rsync -Rac "$SPELL_BOOK_NAME/$SPELL_FILE" "$USER_CANDALF_ROOT"
   chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
   cd
 
   # shellcheck disable=SC2154
-  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" VERBOSE="$VERBOSE" bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $SPELL_FILE"
+  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" VERBOSE="$VERBOSE" \
+    bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $SPELL_FILE"
 }
 
 function _cast() {
