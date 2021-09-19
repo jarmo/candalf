@@ -254,6 +254,15 @@ Notice that instead of using the function `cast` we need to use the function cal
 difference between applying spells to the `root` or to a specific user.
 
 
+## Always Casting a Spell
+
+Sometimes there is a need to cast spell every time even when it has not been
+changed. It can be easily done by prefixing `cast` or `cast_as` with `CAST_ALWAYS=1` flag:
+```
+CAST_ALWAYS=1 cast spells/upgrade.sh
+```
+
+
 ## Casting Spells From Multiple Spell Books
 
 Candalf supports casting spells from multiple spell books. For example there
@@ -448,17 +457,6 @@ cast spell script and then spells with `.YYYYmmddHHMMSS` extension, which are
 spells applied in the past. Timestamp extension reflects the time when that
 spell was replaced by a new one and not a time when it was cast.
 
-
-### Re-Casting a Spell
-
-Sometimes there is a need to cast some alrady casted spell again. It can be
-done by removing a `.current` file in the server. For example, let's imagine
-that a spell `spells/system/upgrade.sh` should be cast again. Run the following
-commands to do it:
-```bash
-ssh example.org "rm -f .candalf/spells/system/upgrade.sh.current" && \
-  candalf example.org
-```
 
 ### Casting Spells Manually
 
