@@ -219,6 +219,11 @@ already cast this spell and will not do much again. However, as soon as you
 change that spell script then it will be cast again from the beginning to the
 end.
 
+**PS!** Spell book file name is used at the remote system for keeping track of
+spells - if you rename it then all the spells will be applied again. Make sure
+to rename all spell book directories on remote system before running candalf
+again after rename!
+
 
 ## Casting Spells for Unprivileged Users
 
@@ -247,6 +252,20 @@ candalf example.org book.sh
 Notice that instead of using the function `cast` we need to use the function called
 `cast_as` with a user name parameter and a spell path. That's the only
 difference between applying spells to the `root` or to a specific user.
+
+
+## Casting Spells From Multiple Spell Books
+
+Candalf supports casting spells from multiple spell books. For example there
+might a be a base spell book, which is the same for every system and then
+a specific spell book for a specific system. They can be built on top of each
+other and then can be applied one by one or by specifying them one the same
+command line where they will be applied from left to right:
+```
+candalf example.org spell-book-one/base.sh spell-book-two/specific.sh
+```
+
+Spell book names have to be unique to avoid name conflicts!
 
 
 ## Using Different Shells

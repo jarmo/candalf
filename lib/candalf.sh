@@ -26,7 +26,7 @@ candalf() {
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
     -e "ssh $SSH_OUTPUT_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
-  cd
+  cd - >/dev/null
 
   # shellcheck disable=SC2154,SC2029
   ssh "$SSH_OUTPUT_FLAG" -tt "$CANDALF_SERVER" \
@@ -36,7 +36,6 @@ candalf() {
 
 bootstrap() {
   CANDALF_SERVER="${1:?"CANDALF_SERVER not set!"}"
-  SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
 
   HOSTNAME=$(hostname -s 2>/dev/null || hostname -f)
   USERNAME=$(id -un)
@@ -112,7 +111,7 @@ EOF
 
   # shellcheck disable=SC2029
   ssh "$SSH_OUTPUT_FLAG" "$CANDALF_SERVER" \
-    "env CANDALF_ROOT=$CANDALF_REMOTE_ROOT sh" < "$CANDALF_ROOT"/lib/bootstrap.sh
+    env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" sh < "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 
 kill_ssh_agent() {

@@ -2,7 +2,7 @@
 
 usage() {
   echo "
-Usage: $(basename "$0") [-v | --verbose] SERVER SPELL_BOOK
+Usage: $(basename "$0") [-v | --verbose] SERVER SPELL_BOOK...
 
 Options:
   -v --verbose   enable verbose output
@@ -56,7 +56,7 @@ set -Eeuo pipefail
 
 CANDALF_ROOT=$(dirname "$(realpath "$0")")
 CANDALF_SERVER=${1:?"SERVER not set!"}
-SPELL_BOOK=${2:?"SPELL_BOOK not set!"}
+shift
 
 if [[ "$CANDALF_SERVER" = "localhost" || "$CANDALF_SERVER" = "127.0.0.1" ]]; then
   . "$CANDALF_ROOT"/lib/candalf-local.sh
@@ -64,9 +64,12 @@ else
   . "$CANDALF_ROOT"/lib/candalf.sh
 fi
 
-bootstrap "$CANDALF_SERVER" "$SPELL_BOOK"
+bootstrap "$CANDALF_SERVER"
 
-echo -e "Applying spells from $SPELL_BOOK\n"
-candalf "$CANDALF_SERVER" "$SPELL_BOOK"
-echo "Applying spells from $SPELL_BOOK completed"
+for SPELL_BOOK in "$@"
+do
+    echo -e "Applying spells from $SPELL_BOOK\n"
+    candalf "$CANDALF_SERVER" "$SPELL_BOOK"
+    echo -e "Applying spells from $SPELL_BOOK completed\n"
+done
 
