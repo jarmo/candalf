@@ -24,7 +24,7 @@ candalf() {
   cd - >/dev/null
 
   # shellcheck disable=SC2154
-  env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" \
+  env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE" "${candalfEnvVars[@]-}" \
     bash -c "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME" 2>&1 | tee -a /var/log/candalf.log
 }
 

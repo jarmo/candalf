@@ -405,6 +405,9 @@ SSH server does not need be running to use Candalf on a local system.
 
 ## Best Practices
 
+* Use `--dry-run` mode before casting spells for real to see what would happen
+after your last changes.
+
 * Write spell scripts like you would write database migrations - keep in
 mind that when spell script has been cast successfully then it
 will be _committed_ which means that Candalf will not cast it again.
@@ -451,7 +454,7 @@ When this doesn't help or you need to understand what has happened to the
 system over time you can look into server's `/var/log/candalf.log` where all
 the casted spells and attempts of casting any spells have been logged.
 
-To see all the casted spells in the past look into the server `~/.candalf/spells`
+To see all the casted spells in the past look into the server `~/.candalf/SPELL_BOOK/spells`
 directory - there are spells with extension `.current` which include the latest
 cast spell script and then spells with `.YYYYmmddHHMMSS` extension, which are
 spells applied in the past. Timestamp extension reflects the time when that

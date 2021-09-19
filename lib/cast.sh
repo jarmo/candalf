@@ -51,9 +51,11 @@ function cast_as() {
 }
 
 function _cast() {
-  SPELL_PATH=$1
-  ${SPELL_PATH}
-  cp "$SPELL_PATH" "$SPELL_PATH".current
+  if [[ "$CANDALF_DRY_RUN" != "1" ]]; then
+    SPELL_PATH=$1
+    ${SPELL_PATH}
+    cp "$SPELL_PATH" "$SPELL_PATH".current
+  fi
 }
 
 function log() {

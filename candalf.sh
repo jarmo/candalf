@@ -2,15 +2,19 @@
 
 usage() {
   echo "
-Usage: $(basename "$0") [-v | --verbose] SERVER SPELL_BOOK...
+Usage: $(basename "$0") [-v | --verbose] [-d | --dry-run] SERVER SPELL_BOOK...
 
 Options:
+  -d --dry-run   do not cast any spells, but show what would be casted
   -v --verbose   enable verbose output
   -h --help      show this help
 
 Examples:
   candalf example.org book.sh
-  candalf localhost book.sh"
+  candalf --verbose example.org book.sh
+
+  candalf localhost book.sh
+  candalf --dry-run localhost book.sh"
   exit 1
 }
 
@@ -18,11 +22,14 @@ if [[ ${#} -eq 0 ]]; then
  usage
 fi
 
-optspec=":lvh-:"
+optspec=":dvh-:"
 while getopts "$optspec" optchar; do
   case "${optchar}" in
     -)
       case "${OPTARG}" in
+        dry-run)
+          DRY_RUN=1
+          ;;
         verbose)
           VERBOSE=1
           ;;
@@ -35,6 +42,9 @@ while getopts "$optspec" optchar; do
           fi
           ;;
       esac;;
+    d)
+      DRY_RUN=1
+      ;;
     v)
       VERBOSE=1
       ;;
@@ -53,6 +63,9 @@ shift $((OPTIND-1))
 VERBOSE="${VERBOSE:-""}"
 test $VERBOSE && set -x
 set -Eeuo pipefail
+
+CANDALF_DRY_RUN="${DRY_RUN:-""}"
+test $CANDALF_DRY_RUN && echo "!!! No spells will be cast due to dry-run mode being enabled !!!"
 
 CANDALF_ROOT=$(dirname "$(realpath "$0")")
 CANDALF_SERVER=${1:?"SERVER not set!"}
