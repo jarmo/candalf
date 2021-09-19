@@ -65,8 +65,6 @@ test $VERBOSE && set -x
 set -Eeuo pipefail
 
 CANDALF_DRY_RUN="${DRY_RUN:-""}"
-test $CANDALF_DRY_RUN && echo "!!! No spells will be cast due to dry-run mode being enabled !!!"
-
 CANDALF_ROOT=$(dirname "$(realpath "$0")")
 CANDALF_SERVER=${1:?"SERVER not set!"}
 shift

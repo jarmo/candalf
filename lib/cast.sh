@@ -55,6 +55,8 @@ function _cast() {
     SPELL_PATH=$1
     ${SPELL_PATH}
     cp "$SPELL_PATH" "$SPELL_PATH".current
+  else
+    log "Spell was NOT cast due to dry-run mode being enabled"
   fi
 }
 
