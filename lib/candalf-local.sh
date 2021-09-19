@@ -29,6 +29,14 @@ candalf() {
 }
 
 bootstrap() {
+  USERNAME=$(id -un)
+
+  if [[ "$USERNAME" != "root" ]]; then
+    echo "candalf needs to be executed with root user like this:
+sudo -H candalf..."
+    exit 1
+  fi
+
   "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 
