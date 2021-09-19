@@ -461,7 +461,7 @@ spells applied in the past. Timestamp extension reflects the time when that
 spell was replaced by a new one and not a time when it was cast.
 
 
-### Casting Spells Manually
+### Setting Spells as Cast
 
 It might happen that spell will be cast half-way through and cannot be cast anymore
 due to destructive commands in the beginning of a spell script. Here's one example:
@@ -497,22 +497,35 @@ problem since it has been created by something else, which should not have
 happened in the first place?).
 
 To solve this situation I would recommend running commands manually and then
-set that spell as cast to Candalf so that it would think that it has been
-successfully done.
+set that spell as never to be cast to Candalf so that it would mark it as successfully done.
 
-In this particular case I would run correct command manually in the server and then tell Candalf that
-this spell has been already cast:
-```bash
-SPELL=spells/broken.sh
-cat $SPELL | ssh example.org "cd .candalf && (\
-    [ -f $SPELL.current ] && mv -f $SPELL.current $SPELL.$(date +"%Y%m%d%H%M%S");
-    cat > $SPELL && cp $SPELL $SPELL.current \
-  )"
+To do this you have to prefix spell with `CAST_NEVER=1` flag like this:
 ```
+CAST_NEVER=1 cast spells/command.sh
+```
+
+After running candalf then `spells/command.sh` will be marked as successfully
+ran and you can remove `CAST_NEVER=1` flag.
 
 However, using a solution like this should be a very last resort. Use a VM for
 testing and its snapshot functionality to avoid situations like this in the
 first place!
+
+You can also use `CAST_NEVER` flag as a feature toggle between different
+systems like this:
+```
+DISABLE_SPELL="${CANDALF_DISABLE_SPELL:-""}"
+CAST_NEVER="$DISABLE_SPELL" cast spells/command.sh
+```
+
+Now, running a candalf with `CANDALF_DISABLE_SPELL` environment variable will
+not run any commands inside `spells/command.sh`:
+```
+$ CANDALF_DISABLE_SPELL=1 candalf example.org book.sh
+```
+
+Refer to [Environment Variables](#environment-variables) to understand how to
+pass environment variables to spell books/spells.
 
 
 ## License

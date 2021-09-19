@@ -12,6 +12,7 @@ function cast() {
   CANDALF_ROOT=${CANDALF_ROOT:?"CANDALF_ROOT not set!"}
   SPELL_PATH="$(realpath "$CANDALF_SPELLS_ROOT/$SPELL_FILE")"
   CAST_ALWAYS="${CAST_ALWAYS:-""}"
+  CAST_NEVER="${CAST_NEVER:-""}"
   log "Casting spell $SPELL_PATH as the user $USER"
   if [[ "$CAST_ALWAYS" != "1" && -f "$SPELL_PATH.current" ]]; then
     if ! diff "$SPELL_PATH".current "$SPELL_PATH"; then
@@ -38,6 +39,7 @@ function cast_as() {
   SPELL_BOOK_NAME="$(basename "$CANDALF_SPELLS_ROOT")"
   USER_CANDALF_SPELLS_ROOT="$USER_CANDALF_ROOT/$SPELL_BOOK_NAME"
   CAST_ALWAYS="${CAST_ALWAYS:-""}"
+  CAST_NEVER="${CAST_NEVER:-""}"
   cd "$CANDALF_ROOT"
   mkdir -p "$USER_CANDALF_ROOT/lib"
   rsync -ac lib/cast.sh lib/candalf-env.sh "$USER_CANDALF_ROOT/lib"
@@ -46,14 +48,16 @@ function cast_as() {
   cd - >/dev/null
 
   # shellcheck disable=SC2154
-  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" VERBOSE="$VERBOSE" \
+  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" \
     bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $SPELL_FILE"
 }
 
 function _cast() {
   if [[ "$CANDALF_DRY_RUN" != "1" ]]; then
     SPELL_PATH=$1
-    ${SPELL_PATH}
+    if [[ "$CAST_NEVER" != 1 ]]; then
+      ${SPELL_PATH}
+    fi
     cp "$SPELL_PATH" "$SPELL_PATH".current
   else
     log "Spell was NOT cast due to dry-run mode being enabled"
