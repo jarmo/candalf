@@ -9,7 +9,6 @@ eval "$(candalfEnv)"
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
-  cd
   CANDALF_ROOT=${CANDALF_ROOT:?"CANDALF_ROOT not set!"}
   SPELL_PATH="$(realpath "$CANDALF_SPELLS_ROOT/$SPELL_FILE")"
   log "Casting spell $SPELL_PATH as the user $USER"
@@ -42,7 +41,7 @@ function cast_as() {
   rsync -ac lib/cast.sh lib/candalf-env.sh "$USER_CANDALF_ROOT/lib"
   rsync -Rac "$SPELL_BOOK_NAME/$SPELL_FILE" "$USER_CANDALF_ROOT"
   chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
-  cd
+  cd - >/dev/null
 
   # shellcheck disable=SC2154
   sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" VERBOSE="$VERBOSE" \
