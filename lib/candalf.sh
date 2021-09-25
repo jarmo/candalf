@@ -6,7 +6,7 @@ set -Eeuo pipefail
 
 # shellcheck disable=SC2016
 CANDALF_REMOTE_ROOT='$HOME/.candalf'
-SSH_OUTPUT_FLAG=$([ -z "$VERBOSE" ] && echo "-q" || echo "-v")
+SSH_OUTPUT_FLAG=$(test "$VERBOSE" && echo "-q" || echo "-v")
 
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"

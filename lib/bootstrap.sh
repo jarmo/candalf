@@ -2,7 +2,7 @@
 
 VERBOSE="${VERBOSE:-""}"
 test "$VERBOSE" && set -x
-set -Eeu
+set -eu
 
 install() {
   PACKAGE=$1
