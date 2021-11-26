@@ -400,7 +400,7 @@ Running `candalf` requires **root** permissions so prefix it with `sudo -H` when
 not running as a root. Everything else is the same as running `candalf` regularly to cast spells to
 remote systems via SSH.
 
-SSH server does not need be running to use Candalf on a local system.
+SSH server does not need to be running to use Candalf on a local system.
 
 
 ## Best Practices
