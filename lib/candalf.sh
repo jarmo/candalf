@@ -42,6 +42,11 @@ bootstrap() {
   SSH_KEY_LABEL=$USERNAME@$HOSTNAME
   SSH_KEY_PATH=~/.ssh/$CANDALF_SERVER
 
+  if [[ ! -f "$SSH_KEY_PATH" ]] && grep -q "Host $CANDALF_SERVER" ~/.ssh/config; then
+    SSH_KEY_PATH="$(ssh -G "$CANDALF_SERVER" | grep "identityfile" | cut -d " " -f2)"
+    SSH_KEY_PATH=${SSH_KEY_PATH/#\~/$HOME}
+  fi
+
   if [[ ! -f "$SSH_KEY_PATH" ]]; then
     echo "Trying to login to $CANDALF_SERVER by using root password"
 
