@@ -18,6 +18,7 @@ function cast() {
     if ! diff "$SPELL_PATH".current "$SPELL_PATH"; then
       CURRENT_SPELL=$(cat "$SPELL_PATH")
       _cast "$SPELL_PATH"
+      echo
       NOW=$(date +"%Y%m%d%H%M%S")
       echo -n "$CURRENT_SPELL" > "$SPELL_PATH.$NOW"
     else
