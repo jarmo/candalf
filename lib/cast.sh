@@ -56,6 +56,7 @@ function _cast() {
   if [[ "$CANDALF_DRY_RUN" != "1" ]]; then
     SPELL_PATH=$1
     if [[ "$CAST_NEVER" != 1 ]]; then
+      cd
       ${SPELL_PATH}
     fi
     cp "$SPELL_PATH" "$SPELL_PATH".current
