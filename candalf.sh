@@ -23,8 +23,6 @@ if [[ ${#} -eq 0 ]]; then
  usage
 fi
 
-COLOR_RESET="\\033[0;0m"
-
 optspec=":dvnh-:"
 while getopts "$optspec" optchar; do
   case "${optchar}" in
@@ -37,7 +35,7 @@ while getopts "$optspec" optchar; do
           VERBOSE=1
           ;;
         no-color)
-          NO_COLOR=$COLOR_RESET
+          NO_COLOR=1
           ;;
         help)
           usage
@@ -55,7 +53,7 @@ while getopts "$optspec" optchar; do
       VERBOSE=1
       ;;
     n)
-      NO_COLOR=$COLOR_RESET
+      NO_COLOR=1
       ;;
     h)
       usage

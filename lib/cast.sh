@@ -9,14 +9,6 @@ set -Eeuo pipefail
 eval "$(candalfEnv)"
 
 CANDALF_NO_COLOR="${CANDALF_NO_COLOR:-""}"
-COLOR_RED="${CANDALF_NO_COLOR:-"\\033[0;31m"}"
-COLOR_GREEN="${CANDALF_NO_COLOR:-"\\033[0;32m"}"
-COLOR_GREEN_BG="${CANDALF_NO_COLOR:-"\\033[0;42m"}"
-COLOR_YELLOW="${CANDALF_NO_COLOR:-"\\033[0;33m"}"
-COLOR_YELLOW_BG="${CANDALF_NO_COLOR:-"\\033[0;43m"}"
-COLOR_MAGENTA="${CANDALF_NO_COLOR:-"\\033[0;35m"}"
-COLOR_GREY="${CANDALF_NO_COLOR:-"\\033[0;90m"}"
-COLOR_END="${CANDALF_NO_COLOR:-"\\033[0;0m"}"
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
@@ -89,3 +81,27 @@ function log_error() {
   log "${COLOR_RED}Failed${COLOR_END} to cast spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}\n"
   exit 1
 }
+
+function define_colors() {
+  COLOR_RED=""
+  COLOR_GREEN=""
+  COLOR_GREEN_BG=""
+  COLOR_YELLOW=""
+  COLOR_YELLOW_BG=""
+  COLOR_MAGENTA=""
+  COLOR_GREY=""
+  COLOR_END=""
+
+  if [[ "$CANDALF_NO_COLOR" == "" ]]; then
+    COLOR_RED='\033[0;31m'
+    COLOR_GREEN='\033[0;32m'
+    COLOR_GREEN_BG='\033[0;42m'
+    COLOR_YELLOW='\033[0;33m'
+    COLOR_YELLOW_BG='\033[0;43m'
+    COLOR_MAGENTA='\033[0;35m'
+    COLOR_GREY='\033[0;90m'
+    COLOR_END='\033[0;0m'
+  fi
+}
+
+define_colors
