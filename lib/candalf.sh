@@ -8,6 +8,7 @@ set -Eeuo pipefail
 CANDALF_REMOTE_ROOT='$HOME/.candalf'
 SSH_OUTPUT_FLAG=$(test "$VERBOSE" && echo "-v" || echo "-q")
 
+# shellcheck source=lib/candalf-env.sh
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"
 

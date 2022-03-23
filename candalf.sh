@@ -64,14 +64,16 @@ VERBOSE="${VERBOSE:-""}"
 test $VERBOSE && set -x
 set -Eeuo pipefail
 
-CANDALF_DRY_RUN="${DRY_RUN:-""}"
+export CANDALF_DRY_RUN="${DRY_RUN:-""}"
 CANDALF_ROOT=$(dirname "$(realpath "$0")")
 CANDALF_SERVER=${1:?"SERVER not set!"}
 shift
 
 if [[ "$CANDALF_SERVER" = "localhost" || "$CANDALF_SERVER" = "127.0.0.1" ]]; then
+  # shellcheck source=lib/candalf-local.sh
   . "$CANDALF_ROOT"/lib/candalf-local.sh
 else
+  # shellcheck source=lib/candalf.sh
   . "$CANDALF_ROOT"/lib/candalf.sh
 fi
 

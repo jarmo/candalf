@@ -4,6 +4,7 @@ VERBOSE="${VERBOSE:-""}"
 test "$VERBOSE" && set -x
 set -Eeuo pipefail
 
+# shellcheck source=lib/candalf-env.sh
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"
 
