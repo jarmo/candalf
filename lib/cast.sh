@@ -86,6 +86,6 @@ function log() {
 }
 
 function log_error() {
-  log "${COLOR_RED}Failed${COLOR_END} to cast spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}"
+  log "${COLOR_RED}Failed${COLOR_END} to cast spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}\n"
   exit 1
 }
