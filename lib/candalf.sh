@@ -62,8 +62,7 @@ bootstrap() {
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
-  trap kill_ssh_agent ERR
-  trap kill_ssh_agent EXIT
+  trap kill_ssh_agent ERR EXIT
   eval "$(ssh-agent -s)" >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 
