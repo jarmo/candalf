@@ -57,6 +57,7 @@ function _cast() {
     SPELL_PATH=$1
     if [[ "$CAST_NEVER" != 1 ]]; then
       cd
+      echo
       ${SPELL_PATH}
       echo
     fi
