@@ -8,13 +8,22 @@ set -Eeuo pipefail
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"
 
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_GREEN_BG='\033[0;42m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_YELLOW_BG='\033[0;43m'
+COLOR_MAGENTA='\033[0;35m'
+COLOR_GREY='\033[0;90m'
+COLOR_END='\033[0m'
+
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
   CANDALF_ROOT=${CANDALF_ROOT:?"CANDALF_ROOT not set!"}
   SPELL_PATH="$(realpath "$CANDALF_SPELLS_ROOT/$SPELL_FILE")"
   CAST_ALWAYS="${CAST_ALWAYS:-""}"
   CAST_NEVER="${CAST_NEVER:-""}"
-  log "Casting spell $SPELL_PATH as the user $USER"
+  log "${COLOR_GREEN}Casting${COLOR_END} spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}"
   if [[ "$CAST_ALWAYS" != "1" && -f "$SPELL_PATH.current" ]]; then
     if ! diff "$SPELL_PATH".current "$SPELL_PATH"; then
       CURRENT_SPELL=$(cat "$SPELL_PATH")
@@ -22,13 +31,13 @@ function cast() {
       NOW=$(date +"%Y%m%d%H%M%S")
       echo -n "$CURRENT_SPELL" > "$SPELL_PATH.$NOW"
     else
-      log "Skipping spell $SPELL_PATH since it has been cast already as the user $USER"
+      log "${COLOR_GREY}Skipping${COLOR_END} spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} since it has been cast already as the user ${COLOR_MAGENTA}$USER${COLOR_END}"
     fi
   else
     cat "$SPELL_PATH"
     _cast "$SPELL_PATH"
   fi
-  log "Casting spell $SPELL_PATH completed as the user $USER\n"
+  log "${COLOR_GREEN_BG}Casting${COLOR_END} spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} completed as the user ${COLOR_MAGENTA}$USER${COLOR_END}\n"
 }
 
 function cast_as() {
@@ -59,16 +68,23 @@ function _cast() {
     if [[ "$CAST_NEVER" != 1 ]]; then
       cd
       echo
+      trap log_error INT ERR
       ${SPELL_PATH}
+      trap - INT ERR
       echo
     fi
     cp "$SPELL_PATH" "$SPELL_PATH".current
   else
     echo
-    log "Spell was NOT cast due to dry-run mode being enabled"
+    log "Spell was NOT cast due to ${COLOR_YELLOW_BG}dry-run${COLOR_END} mode being enabled"
   fi
 }
 
 function log() {
   echo -e "[$(date +"%Y-%m-%d %H:%M:%S")] - $1"
+}
+
+function log_error() {
+  log "${COLOR_RED}Failed${COLOR_END} to cast spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}"
+  exit 1
 }
