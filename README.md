@@ -54,19 +54,18 @@ First, clone Candalf itself on your local system:
 git clone https://github.com/jarmo/candalf.git
 ```
 
-Create a symlink into some directory in your `$PATH`, for example:
 ```bash
 sudo ln -s $(realpath candalf/candalf.sh) /usr/local/bin/candalf
 ```
 
 Create a separate project/directory for your server spell scripts:
 ```bash
-mkdir -p example.org/spells
+mkdir -p example/spells
 ```
 
 Create your first spell scripts:
 ```bash
-cd example.org
+cd example
 
 cat << 'EOF' > spells/now.sh
 #!/usr/bin/env bash
@@ -93,7 +92,7 @@ chmod +x spells/me.sh
 
 Create a script for casting all the spells (so-called spell book):
 ```bash
-cat << 'EOF' > example.org.sh
+cat << 'EOF' > example-book.sh
 #!/usr/bin/env bash
 
 test $VERBOSE && set -x
@@ -105,12 +104,12 @@ cast spell/now.sh
 cast spell/me.sh
 EOF
 
-chmod +x example.org.sh
+chmod +x example-book.sh
 ```
 
 Cast all spells to the server at example.org:
 ```bash
-candalf example.org example.org.sh
+candalf example.org example-book.sh
 ```
 
 During the first run you will be asked a couple of times the root password of the remote system to
@@ -159,7 +158,7 @@ or configuring anything there manually.
 
 Spell book script of a server is a pretty simple one. Let's create one without any spells in it:
 ```bash
-cat << 'EOF' > example.org.sh
+cat << 'EOF' > example-book.sh
 #!/usr/bin/env bash
 
 test $VERBOSE && set -x
@@ -168,7 +167,7 @@ set -Eeo pipefail
 . ${CANDALF_ROOT:="."}/lib/cast.sh
 EOF
 
-chmod +x example.org.sh
+chmod +x example-book.sh
 ```
 
 It's pretty straightforward - first it has a `shebang` line which instructs
@@ -210,13 +209,13 @@ It's always a good idea to do this on a new system before doing anything else.
 
 Let's add this spell into our spell book script, otherwise it will not be cast:
 ```bash
-echo "cast spells/system/upgrade.sh" >> example.org.sh
+echo "cast spells/system/upgrade.sh" >> example-book.sh
 ```
 
 Let's cast all the defined spells (we assume that Candalf itself has been installed already
 as specified in the [Installation](#installation) section):
 ```bash
-candalf example.org example.org.sh
+candalf example.org example-book.sh
 ```
 
 If everything goes well then a SSH key is going to be created, it will be
@@ -256,9 +255,9 @@ EOF
 
 chmod +x spells/john/whoami.sh
 
-echo "cast_as john spells/john/whoami.sh" >> example.org.sh
+echo "cast_as john spells/john/whoami.sh" >> example-book.sh
 
-candalf example.org example.org.sh
+candalf example.org example-book.sh
 ```
 
 Notice that instead of using the function `cast` we need to use the function called
@@ -355,9 +354,9 @@ chmod +x spells/secret.sh
 
 Let's add it to our spell-book and cast it as any other spell:
 ```bash
-echo "cast spells/secret.sh" >> example.org.sh
+echo "cast spells/secret.sh" >> example-book.sh
 
-candalf example.org example.org.sh
+candalf example.org example-book.sh
 ```
 
 When this spell gets cast, then you will be asked for the encryption password.
@@ -399,7 +398,7 @@ out early with an error when that environment variable has not been set.
 
 Now, to execute candalf just specify password on the command line like this:
 ```
-CANDALF_PASSWORD="encryption password" candalf example.org example.org.sh
+CANDALF_PASSWORD="encryption password" candalf example.org example-book.sh
 ```
 
 ## Casting Spells Locally
@@ -409,7 +408,7 @@ setting up your own machine.
 
 To do this you simply need to specify `SERVER` parameter as a special parameter `localhost` or `127.0.0.1`:
 ```bash
-sudo -H candalf localhost example.org.sh
+sudo -H candalf localhost example-book.sh
 ```
 
 Running `candalf` requires **root** permissions so prefix it with `sudo -H` when
@@ -460,7 +459,7 @@ help you with.
 
 You can enable `VERBOSE` mode by running `candalf` like this:
 ```bash
-candalf -v example.org example.org.sh
+candalf -v example.org example-book.sh
 ```
 
 Beware that there will be a lot of output, but hopefully you can find the
@@ -537,7 +536,7 @@ CAST_NEVER="$DISABLE_SPELL" cast spells/command.sh
 Now, running a candalf with `CANDALF_DISABLE_SPELL` environment variable will
 not run any commands inside `spells/command.sh`:
 ```
-$ CANDALF_DISABLE_SPELL=1 candalf example.org example.org.sh
+$ CANDALF_DISABLE_SPELL=1 candalf example.org example-book.sh
 ```
 
 Refer to [Environment Variables](#environment-variables) to understand how to
