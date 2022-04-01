@@ -67,27 +67,29 @@ Create your first spell scripts:
 ```bash
 cd example
 
-cat << 'EOF' > spells/now.sh
+cat << 'EOF' > spells/today.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-date > ~/now
+date +"%Y-%m-%d" > ~/today
+cat ~/today
 EOF
 
-chmod +x spells/now.sh
+chmod +x spells/today.sh
 
-cat << 'EOF' > spells/me.sh
+cat << 'EOF' > spells/whoami.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-id -un > ~/me
+whoami > ~/me
+cat ~/me
 EOF
 
-chmod +x spells/me.sh
+chmod +x spells/whoami.sh
 ```
 
 Create a script for casting all the spells (so-called spell book):
@@ -95,19 +97,19 @@ Create a script for casting all the spells (so-called spell book):
 cat << 'EOF' > example-book.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-. ${CANDALF_ROOT:="."}/lib/cast.sh
+. "${CANDALF_ROOT:="."}"/lib/cast.sh
 
-cast spell/now.sh 
-cast spell/me.sh
+cast spells/today.sh 
+cast spells/whoami.sh
 EOF
 
 chmod +x example-book.sh
 ```
 
-Cast all spells to the server at example.org:
+Cast all the spells to the server at example.org:
 ```bash
 candalf example.org example-book.sh
 ```
@@ -132,6 +134,8 @@ Host example.org
 
 There will be also SSH public/private key under `~/.ssh` having the server domain
 name as their file names (~/.ssh/example.org and ~/.ssh/example.org.pub respectively).
+
+See [example](example) for a simple spell book example.
 
 
 ### Installation With Preconfigured SSH Server
@@ -161,10 +165,11 @@ Spell book script of a server is a pretty simple one. Let's create one without a
 cat << 'EOF' > example-book.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-. ${CANDALF_ROOT:="."}/lib/cast.sh
+. "${CANDALF_ROOT:="."}"/lib/cast.sh
+
 EOF
 
 chmod +x example-book.sh
@@ -193,7 +198,7 @@ mkdir -p spells/system
 cat << 'EOF' > spells/system/upgrade.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 apt update -y
@@ -247,10 +252,11 @@ mkdir -p spells/john
 cat << 'EOF' > spells/john/whoami.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-whoami
+whoami > ~/me
+cat ~/me
 EOF
 
 chmod +x spells/john/whoami.sh
@@ -300,7 +306,7 @@ For example, here's how you would use Zsh instead of Bash:
 cat << 'EOF' > spells/zsh.sh
 #!/usr/bin/env zsh
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 echo $SHELL
@@ -325,35 +331,54 @@ a really simple tool for symmetric key encryption/decryption.
 
 First, let's create our encrypted data:
 ```bash
-echo "some secret thing" | encpipe -e -p "encryption password" | base64 -w0
+echo "some secret thing" | encpipe -e -p "encryption-password" | base64 -w0
 ```
 
 Output of this command will be a base64 encoded encrypted secret which you can
-safely commit to VCS. You need to remember `encryption password` since this is
+safely commit to VCS. You need to remember `encryption-password` since this is
 needed when applying spell in the future.
+
+Let's create a spell for getting `encpipe` binary for decryption at server-side:
+```bash
+cat << 'EOF' > spells/system/encpipe.sh
+#!/usr/bin/env bash 
+
+test "$VERBOSE" && set -x
+set -Eeo pipefail
+
+apt update -y
+git clone https://github.com/jedisct1/encpipe.git
+cd encpipe
+make
+make install
+EOF
+
+chmod +x spells/system/encpipe.sh
+```
 
 Let's create the relevant spell for using that encrypted data:
 ```bash
 cat << 'EOF' > spells/secret.sh
 #!/usr/bin/env bash 
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 read -rsp "Enter secrets password: " PASSWORD
 echo
 
-SECRET=$(echo "EgAAAHHp8AQhiyZqSU6ZgZg3fez34hMVI5C1OWBuo/YaWEhmfXr2eJUp1stS9qAsjDw9zQ4CdhfWjwAAAAANbk3myi1vpG2JR3wlBwcj6qob9f0HSmnjwOq0G2Kr+IUnTQg=" | \
+SECRET=$(echo "EgAAAHEAVUE0ahrrdU0gEdS++89Zy8pFMhUe8lci9mdWZgfs70s9Q7Ge4pI62FcQFa5/gk5kS9oIVAAAAABSA8C6vGOpSDySUMnbwZQ58I23jXu+96bu6s7TrAzVZpknWvw=" | \
   base64 -d | \
   encpipe -d -p "$PASSWORD")
-echo "Decrypted: $SECRET"
+echo "$SECRET" > decrypted.secret
 EOF
 
 chmod +x spells/secret.sh
 ```
 
-Let's add it to our spell-book and cast it as any other spell:
+Let's add these spells to our spell-book and cast them as any other spells:
 ```bash
+echo "cast spells/system/encpipe.sh" >> example-book.sh
 echo "cast spells/secret.sh" >> example-book.sh
 
 candalf example.org example-book.sh
@@ -362,9 +387,6 @@ candalf example.org example-book.sh
 When this spell gets cast, then you will be asked for the encryption password.
 In this example we just print out the decrypted data, but in the real world you
 can do whatever you need to do with that data.
-
-Don't forget to create a spell script for installing encpipe to the remote system
-too!
 
 
 ## Environment Variables
@@ -380,12 +402,12 @@ Let's modify our secret spell file:
 cat << 'EOF' > spells/secret.sh
 #!/usr/bin/env bash 
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 CANDALF_PASSWORD="${CANDALF_PASSWORD:?"CANDALF_PASSWORD is missing!"}"
 
-SECRET=$(echo "EgAAAHHp8AQhiyZqSU6ZgZg3fez34hMVI5C1OWBuo/YaWEhmfXr2eJUp1stS9qAsjDw9zQ4CdhfWjwAAAAANbk3myi1vpG2JR3wlBwcj6qob9f0HSmnjwOq0G2Kr+IUnTQg=" | \
+SECRET=$(echo "EgAAAHEAVUE0ahrrdU0gEdS++89Zy8pFMhUe8lci9mdWZgfs70s9Q7Ge4pI62FcQFa5/gk5kS9oIVAAAAABSA8C6vGOpSDySUMnbwZQ58I23jXu+96bu6s7TrAzVZpknWvw=" | \
   base64 -d | \
   encpipe -d -p "$CANDALF_PASSWORD")
 echo "Decrypted: $SECRET"
@@ -398,7 +420,7 @@ out early with an error when that environment variable has not been set.
 
 Now, to execute candalf just specify password on the command line like this:
 ```
-CANDALF_PASSWORD="encryption password" candalf example.org example-book.sh
+CANDALF_PASSWORD="encryption-password" candalf example.org example-book.sh
 ```
 
 ## Casting Spells Locally
@@ -484,7 +506,7 @@ due to destructive commands in the beginning of a spell script. Here's one examp
 cat << 'EOF' > spells/command.sh
 #!/usr/bin/env bash
 
-test $VERBOSE && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 mkdir foo
