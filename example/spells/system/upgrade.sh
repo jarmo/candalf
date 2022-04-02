@@ -5,3 +5,5 @@ set -Eeo pipefail
 
 apt update -y
 apt upgrade -y
+
+touch ~/upgrade-done
