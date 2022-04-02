@@ -8,6 +8,10 @@ set -Eeuo pipefail
 CANDALF_REMOTE_ROOT='$HOME/.candalf'
 SSH_OUTPUT_FLAG=$(test "$VERBOSE" && echo "-v" || echo "-q")
 
+CANDALF_SSH_CONFIG_PATH="${CANDALF_SSH_CONFIG_PATH:-""}"
+SSH_CONFIG_PATH=$(test "$CANDALF_SSH_CONFIG_PATH" && echo "$CANDALF_SSH_CONFIG_PATH" || echo "$HOME/.ssh/config")
+SSH_CONFIG_FLAG=$(test "$CANDALF_SSH_CONFIG_PATH" && echo "-F $CANDALF_SSH_CONFIG_PATH" || echo "-F $SSH_CONFIG_PATH")
+
 # shellcheck source=lib/candalf-env.sh
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"
@@ -21,16 +25,16 @@ candalf() {
   SPELL_BOOK_BASENAME_WITHOUT_EXT="$(basename "$SPELL_BOOK_BASENAME" .sh)"
   CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME_WITHOUT_EXT"
 
-  rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q" \
+  rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q $SSH_CONFIG_FLAG" \
     "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
-    -e "ssh $SSH_OUTPUT_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
+    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
   cd - >/dev/null
 
-  # shellcheck disable=SC2154,SC2029
-  ssh "$SSH_OUTPUT_FLAG" -tt "$CANDALF_SERVER" \
+  # shellcheck disable=SC2154,SC2029,SC2086
+  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
     env "${candalfEnvVars[@]-}" CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE" \
       "bash -c '$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME 2>&1' | tee -a /var/log/candalf.log"
 }
@@ -43,8 +47,9 @@ bootstrap() {
   SSH_KEY_LABEL=$USERNAME@$HOSTNAME
   SSH_KEY_PATH=~/.ssh/$CANDALF_SERVER
 
-  if [[ ! -f "$SSH_KEY_PATH" ]] && grep -q "Host $CANDALF_SERVER" ~/.ssh/config; then
-    SSH_KEY_PATH="$(ssh -G "$CANDALF_SERVER" | grep "identityfile" | cut -d " " -f2)"
+  if [[ ! -f "$SSH_KEY_PATH" ]] && grep -q "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH"; then
+    # shellcheck disable=SC2086
+    SSH_KEY_PATH="$(ssh -G $SSH_CONFIG_FLAG "$CANDALF_SERVER" | grep "identityfile" | cut -d " " -f2)"
     SSH_KEY_PATH=${SSH_KEY_PATH/#\~/$HOME}
   fi
 
@@ -66,7 +71,7 @@ bootstrap() {
   eval "$(ssh-agent -s)" >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 
-  SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG -tt \
+  SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG -tt \
     -o PubkeyAuthentication=yes \
     -o PasswordAuthentication=no \
     -o IdentitiesOnly=yes \
@@ -81,15 +86,15 @@ bootstrap() {
     echo "From now on use SSH key $SSH_KEY_PATH for logging into root@$CANDALF_SERVER"
   fi
 
-  if ! grep --quiet "Host $CANDALF_SERVER" ~/.ssh/config; then
+  if ! grep --quiet "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH"; then
     SSH_SERVER_PORT=$(shuf -i 13337-65535 -n 1)
   else
-    SSH_SERVER_PORT=$(grep -A 10 "Host $CANDALF_SERVER" ~/.ssh/config | grep "Port" | head -1 | cut -d " " -f4)
+    SSH_SERVER_PORT=$(grep -A 10 "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH" | grep "Port" | head -1 | cut -d " " -f4)
   fi    
 
   if ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT"; then
-    # shellcheck disable=SC2029
-    ssh "$SSH_OUTPUT_FLAG" \
+    # shellcheck disable=SC2029,SC2086
+    ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG \
       -o PubkeyAuthentication=yes \
       -o PasswordAuthentication=no \
       -o IdentitiesOnly=yes \
@@ -99,8 +104,8 @@ bootstrap() {
       "env SSH_SERVER_PORT=$SSH_SERVER_PORT sh" < "$CANDALF_ROOT"/lib/sshd.sh
   fi
 
-  if ! grep --quiet "Host $CANDALF_SERVER" ~/.ssh/config; then
-    cat << EOF >> ~/.ssh/config
+  if ! grep --quiet "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH"; then
+    cat << EOF >> "$SSH_CONFIG_PATH"
 
 Host $CANDALF_SERVER
   Hostname $CANDALF_SERVER
@@ -114,8 +119,8 @@ Host $CANDALF_SERVER
 EOF
   fi
 
-  # shellcheck disable=SC2029
-  ssh "$SSH_OUTPUT_FLAG" "$CANDALF_SERVER" \
+  # shellcheck disable=SC2029,SC2086
+  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG "$CANDALF_SERVER" \
     env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" sh < "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 
