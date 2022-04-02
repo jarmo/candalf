@@ -65,6 +65,8 @@ function _cast() {
       ${SPELL_PATH}
       trap - INT ERR
       echo
+    else
+      log "Spell was NOT cast due to ${COLOR_YELLOW_BG}CAST_NEVER=1${COLOR_END} attribute"
     fi
     cp "$SPELL_PATH" "$SPELL_PATH".current
   else
