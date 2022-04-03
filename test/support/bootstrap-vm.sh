@@ -12,10 +12,10 @@ compat_sed() {
 }
 
 compat_useradd() {
-  USER="$1"
-  (command -v useradd > /dev/null && useradd -m "$USER") || \
-    (command -v pw > /dev/null && pw useradd -mn "$USER") || \
-    (command -v adduser && adduser -D "$USER") || \
+  NEW_USER="$1"
+  (command -v useradd > /dev/null && useradd -m "$NEW_USER") || \
+    (command -v pw > /dev/null && pw useradd -mn "$NEW_USER") || \
+    (command -v adduser && adduser -D "$NEW_USER") || \
     (echo "No useradd binaries detected" && exit 1)
 }
 
