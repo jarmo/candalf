@@ -1,0 +1,35 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# When Vagrant default private key ends up on a Windows file system
+# then SSH won't work under WSL since that file has too open permissions.
+# That's why we need to copy that default private key under /tmp which
+# presumably is outside of Windows file-system and allows setting file
+# permissions properly for SSH.
+def prepare_ssh_for_wsl(ssh_config)
+  private_key_path = "/tmp/candalf-test"
+  FileUtils.cp "support/ssh/private-key", private_key_path
+  FileUtils.chmod 0600, private_key_path
+  ssh_config.private_key_path = private_key_path
+  ssh_config.insert_key = false
+end
+
+Vagrant.configure("2") do |config|
+  config.vm.box = ENV["VAGRANT_BOX"] || "generic/ubuntu2110"
+  config.vm.box_check_update = false
+  config.vm.synced_folder "../", "/candalf"
+  config.vm.provision "shell", path: "support/bootstrap-vm.sh"
+  config.vm.usable_port_range = 2222..2222
+
+  prepare_ssh_for_wsl(config.ssh)
+
+  config.vm.define "candalf-test" do |vm_config|
+    vm_config.vm.hostname = "candalf-test"
+  end
+
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    require "etc"
+    v.cpus = [Etc.nprocessors / 2, 2].max
+  end
+end

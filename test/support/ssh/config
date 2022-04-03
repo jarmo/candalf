@@ -1,0 +1,11 @@
+Host candalf-test
+  Hostname localhost
+  Port 2222
+  User root
+  IdentityFile /tmp/candalf-test
+  IdentitiesOnly yes
+  PasswordAuthentication no
+  PubkeyAuthentication yes
+  PreferredAuthentications publickey
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no

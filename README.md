@@ -567,6 +567,52 @@ Refer to [Environment Variables](#environment-variables) to understand how to
 pass environment variables to spell books/spells.
 
 
+## Development
+
+Development of Candalf is easy - just modify scripts in this repository and
+execute `candalf.sh` directly instead of using a globally installed `candalf`
+command.
+
+
+## Testing
+
+All the shell scripts in here are checked with [ShellCheck](https://www.shellcheck.net/).
+
+Candalf also has tests and they are being run inside virtual machines (VM).
+See all the existing tests inside [test](test) directory.
+
+Tests have been run from Ubuntu Linux and might not work from anywhere else.
+
+Some prerequisites need to be fulfilled before running tests:
+
+1. Install [ShellCheck](https://www.shellcheck.net) - recommended way of doing
+   that is via [asdf](http://asdf-vm.com/) by installing correct version
+   described in [.tool-versions](.tool-versions).
+2. Install [VirtualBox](https://www.virtualbox.org).
+3. Install [Vagrant](https://www.vagrantup.com).
+4. Modify `/etc/hosts` so that `candalf-test` would point against your local machine:
+```bash
+$ echo "127.0.0.1 candalf-test" | sudo tee -a /etc/hosts
+```
+
+To run all the tests against [Ubuntu Linux](https://app.vagrantup.com/generic/boxes/ubuntu2110)
+and [FreeBSD](https://app.vagrantup.com/generic/boxes/freebsd13) virtual machines, execute the
+following command:
+```
+$ make test
+```
+
+To execute a single test against an Ubuntu Linux VM:
+```
+$ test/test-[NAME].sh
+```
+
+To execute a single test against FreeBSD VM:
+```
+$ VAGRANT_BOX="generic/freebsd13" test/test-[NAME].sh
+```
+
+
 ## License
 
 Candalf is released under a *Lesser GNU Affero General Public License*, which
