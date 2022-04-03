@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 test "$VERBOSE" && set -x
-set -Eeuo pipefail
+set -eu
 
 compat_sed() {
   SUBSITUTION_CMD="$1"
