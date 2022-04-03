@@ -9,6 +9,7 @@ install() {
   which "$PACKAGE" >/dev/null || \
     (which apt >/dev/null && apt install -y "$PACKAGE") || \
     (which pkg >/dev/null && pkg install -y "$PACKAGE") || \
+    (which apk >/dev/null && apk add "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
 

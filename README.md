@@ -29,7 +29,7 @@ manually in case of any problems.
 * It's **blazing fast** since only changed spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
 * Any shell is supported since spells are executed using their **shebang** line;
 * Very easy to understand what Candalf does exactly since it is implemented as a **few hundred lines** of shell scripts;
-* Supports **Ubuntu** (Debian Linux) and **FreeBSD** (Unix-like) OS-es out of the box, but adding support to a new Linux/Unix-like OS is pretty easy too.
+* Supports **Ubuntu** (Debian Linux), **FreeBSD** (Unix-like) OS-es out of the box and **Alpine Linux**, but adding support to a new Linux/Unix-like OS is pretty easy too thanks to [tests](test).
 
 
 ## Dependencies
@@ -595,9 +595,8 @@ Some prerequisites need to be fulfilled before running tests:
 $ echo "127.0.0.1 candalf-test" | sudo tee -a /etc/hosts
 ```
 
-To run all the tests against [Ubuntu Linux](https://app.vagrantup.com/generic/boxes/ubuntu2110)
-and [FreeBSD](https://app.vagrantup.com/generic/boxes/freebsd13) virtual machines, execute the
-following command:
+To run all the tests against all supported virtual machines (see [Makefile](Makefile)),
+execute the following command:
 ```
 $ make test
 ```
@@ -611,6 +610,8 @@ To execute a single test against FreeBSD VM:
 ```
 $ VAGRANT_BOX="generic/freebsd13" test/test-[NAME].sh
 ```
+
+Use any other `VAGRANT_BOX` environment value to run tests against that VM.
 
 
 ## License
