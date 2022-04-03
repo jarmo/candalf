@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 
 TEST_DIR="${TEST_DIR:?"TEST_DIR is required!"}"
+KEEP_VM="${KEEP_VM:-""}"
 SNAPSHOT_NAME="pristine"
 
 vm_prepare() {
@@ -20,7 +21,7 @@ vm_start() {
 }
 
 vm_destroy() {
-  vagrant destroy --force
+  [[ "$KEEP_VM" = 1 ]] || vagrant destroy --force
 }
 
 vm_save() {
@@ -28,7 +29,8 @@ vm_save() {
 }
 
 vm_restore() {
-  vm_is_running && vagrant snapshot restore --no-provision "$SNAPSHOT_NAME"
+  vm_is_running && \
+    ([[ "$KEEP_VM" = 1 ]] || vagrant snapshot restore --no-provision "$SNAPSHOT_NAME")
 }
 
 vm_exec() {

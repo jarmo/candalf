@@ -587,8 +587,6 @@ All the shell scripts in here are checked with [ShellCheck](https://www.shellche
 Candalf also has tests and they are being run inside virtual machines (VM).
 See all the existing tests inside [test](test) directory.
 
-Tests have been run from Ubuntu Linux and might not work from anywhere else.
-
 Some prerequisites need to be fulfilled before running tests:
 
 1. Install [ShellCheck](https://www.shellcheck.net) - recommended way of doing
@@ -618,6 +616,43 @@ $ VAGRANT_BOX="generic/freebsd13" test/test-[NAME].sh
 ```
 
 Use any other `VAGRANT_BOX` environment value to run tests against that VM.
+
+Tests have been run on Ubuntu Linux and might not work from anywhere else.
+
+
+### Writing and Troubleshooting Tests
+
+Running any test creates a VM from scratch, creates a snapshot and restores to
+that snapshot when multiple tests are run. After all tests have been ran or test has failed, that VM will be destroyed.
+This is good practice to avoid creating tests which depend on each-other.
+
+However during troubleshooting or writing new tests this approach uses too much
+time. For this there is an environment variable `KEEP_VM=1` which, when enabled,
+does not destroy VM nor restore it from the snapshot. This allows instantaneous
+test executions. Use like this:
+```bash
+$ KEEP_VM=1 ./test/test-example.sh
+```
+
+Having this flag enabled for multiple tests doesn't make sense
+since they will fail due to messing VM up for eachother.
+
+Don't forget to run test without this flag to run against a clean VM afterwards.
+
+
+#### Verbose Tests
+
+`VERBOSE=1` flag works also when running tests. Use it when can't immediately
+understand why your test behaves as it is behaving:
+```bash
+$ VERBOSE=1 make test
+```
+
+or
+
+```bash
+$ VERBOSE=1 test/test-example.sh
+```
 
 
 ## License
