@@ -18,7 +18,7 @@ candalf() {
   SPELL_BOOK_BASENAME_WITHOUT_EXT="$(basename "$SPELL_BOOK_BASENAME" .sh)"
   CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME_WITHOUT_EXT"
 
-  rsync -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT/lib/candalf-env.sh" "$CANDALF_REMOTE_ROOT"/lib
+  rsync -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh "$CANDALF_ROOT"/lib/colors.sh "$CANDALF_REMOTE_ROOT"/lib
 
   cd "$SPELL_BOOK_DIR"
   rsync --exclude ".**" -Rac "." "$CANDALF_SPELLS_ROOT"

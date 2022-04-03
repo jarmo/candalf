@@ -25,8 +25,8 @@ candalf() {
   SPELL_BOOK_BASENAME_WITHOUT_EXT="$(basename "$SPELL_BOOK_BASENAME" .sh)"
   CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME_WITHOUT_EXT"
 
-  rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh -e "ssh -q $SSH_CONFIG_FLAG" \
-    "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
+  rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh "$CANDALF_ROOT"/lib/colors.sh \
+    -e "ssh -q $SSH_CONFIG_FLAG" "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
@@ -67,7 +67,7 @@ bootstrap() {
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
-  trap kill_ssh_agent ERR EXIT
+  trap "kill_ssh_agent" ERR EXIT
   eval "$(ssh-agent -s)" >/dev/null
   ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
 

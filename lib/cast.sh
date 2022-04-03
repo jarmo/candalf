@@ -4,11 +4,10 @@ VERBOSE="${VERBOSE:-""}"
 test "$VERBOSE" && set -x
 set -Eeuo pipefail
 
+. "$CANDALF_ROOT"/lib/colors.sh
 # shellcheck source=lib/candalf-env.sh
 . "$CANDALF_ROOT"/lib/candalf-env.sh
 eval "$(candalfEnv)"
-
-CANDALF_NO_COLOR="${CANDALF_NO_COLOR:-""}"
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
@@ -45,7 +44,7 @@ function cast_as() {
   CAST_NEVER="${CAST_NEVER:-""}"
   cd "$CANDALF_ROOT"
   mkdir -p "$USER_CANDALF_ROOT/lib"
-  rsync -ac lib/cast.sh lib/candalf-env.sh "$USER_CANDALF_ROOT/lib"
+  rsync -ac lib/cast.sh lib/candalf-env.sh lib/colors.sh "$USER_CANDALF_ROOT/lib"
   rsync -Rac "$SPELL_BOOK_NAME/$SPELL_FILE" "$USER_CANDALF_ROOT"
   chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
   cd - >/dev/null
@@ -84,26 +83,3 @@ function log_error() {
   exit 1
 }
 
-function define_colors() {
-  COLOR_RED=""
-  COLOR_GREEN=""
-  COLOR_GREEN_BG=""
-  COLOR_YELLOW=""
-  COLOR_YELLOW_BG=""
-  COLOR_MAGENTA=""
-  COLOR_GREY=""
-  COLOR_END=""
-
-  if [[ "$CANDALF_NO_COLOR" == "" ]]; then
-    COLOR_RED='\033[0;31m'
-    COLOR_GREEN='\033[0;32m'
-    COLOR_GREEN_BG='\033[0;42m'
-    COLOR_YELLOW='\033[0;33m'
-    COLOR_YELLOW_BG='\033[0;43m'
-    COLOR_MAGENTA='\033[0;35m'
-    COLOR_GREY='\033[0;90m'
-    COLOR_END='\033[0;0m'
-  fi
-}
-
-define_colors
