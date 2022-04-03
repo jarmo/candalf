@@ -17,7 +17,7 @@ test-arch:
 
 test-example:
 	VAGRANT_BOX=generic/alpine312 test/test-example.sh
-	VAGRANT_BOX=generic/ubuntu test/test-example.sh
+	VAGRANT_BOX=generic/ubuntu2110 test/test-example.sh
 	VAGRANT_BOX=generic/freebsd13 test/test-example.sh
 	VAGRANT_BOX=generic/arch test/test-example.sh
 
