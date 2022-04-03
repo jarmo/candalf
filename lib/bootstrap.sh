@@ -8,7 +8,7 @@ compat_which() {
   BINARY="$1"
 
   which "$BINARY" 2>/dev/null || \
-    whereis "$BINARY" | awk '{print $2}'
+    whereis "$BINARY" 2>/dev/null | awk '{print $2}'
 }
 
 install() {
