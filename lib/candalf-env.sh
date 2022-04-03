@@ -3,9 +3,9 @@
 candalfEnv() {
   candalfEnvVars=(CANDALF_ENV_VAR_PLACEHOLDER=1)
 
-  while IFS= read -d "" -r var; do
+  while IFS= read -r -d '' var; do
     [[ "$var" == CANDALF_* ]] && candalfEnvVars+=("$var")
-  done < <(env -0)
+  done </proc/self/environ
 
   declare -p candalfEnvVars
 }
