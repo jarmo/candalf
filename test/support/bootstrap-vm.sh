@@ -1,5 +1,8 @@
 #!/usr/bin/env sh
 
+test "$VERBOSE" && set -x
+set -Eeuo pipefail
+
 compat_sed() {
   SUBSITUTION_CMD="$1"
   EDITED_FILE="$2"
