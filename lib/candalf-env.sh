@@ -5,7 +5,7 @@ candalfEnv() {
 
   while IFS= read -r -d '' var; do
     [[ "$var" == CANDALF_* ]] && candalfEnvVars+=("$var")
-  done </proc/self/environ
+  done < <( [[ -f /proc/self/environ ]] && cat /proc/self/environ || env -0)
 
   declare -p candalfEnvVars
 }
