@@ -29,7 +29,7 @@ manually in case of any problems.
 * It's **blazing fast** since only changed spells are sent to the server using rsync and only one ssh connection is made to cast all of them;
 * Any shell is supported since spells are executed using their **shebang** line;
 * Very easy to understand what Candalf does exactly since it is implemented as a **few hundred lines** of shell scripts;
-* Supports and has been tested on the following operating systems:
+* **Supports** the following operating systems:
   - Ubuntu Linux
   - FreeBSD
   - Arch Linux
