@@ -4,12 +4,19 @@ VERBOSE="${VERBOSE:-""}"
 test "$VERBOSE" && set -x
 set -eu
 
+compat_which() {
+  BINARY="$1"
+
+  which "$BINARY" 2>/dev/null || \
+    whereis "$BINARY" | awk '{print $2}'
+}
+
 install() {
   PACKAGE=$1
-  which "$PACKAGE" >/dev/null || \
-    (which apt >/dev/null && apt install -y "$PACKAGE") || \
-    (which pkg >/dev/null && pkg install -y "$PACKAGE") || \
-    (which apk >/dev/null && apk add "$PACKAGE") || \
+  test "$(compat_which "$PACKAGE")" || \
+    (test "$(compat_which apt)" && apt install -y "$PACKAGE") || \
+    (test "$(compat_which pkg)" && pkg install -y "$PACKAGE") || \
+    (test "$(compat_which apk)" && apk add "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
 

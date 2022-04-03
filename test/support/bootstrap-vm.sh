@@ -11,11 +11,18 @@ compat_sed() {
     sed -i "" -e "$SUBSITUTION_CMD" "$EDITED_FILE"
 }
 
+compat_which() {
+  BINARY="$1"
+
+  which "$BINARY" 2>/dev/null || \
+    whereis "$BINARY" | awk '{print $2}'
+}
+
 compat_useradd() {
   USER="$1"
-  (which "useradd" >/dev/null && useradd -m "$USER") || \
-    (which "adduser" >/dev/null && adduser -D "$USER") || \
-    (which "pw" >/dev/null && pw useradd -mn "$USER") || \
+  (test "$(compat_which "useradd")" && useradd -m "$USER") || \
+    (test "$(compat_which "adduser")" && adduser -D "$USER") || \
+    (test "$(compat_which "pw")" && pw useradd -mn "$USER") || \
     (echo "No useradd binaries detected" && exit 1)
 }
 
@@ -25,4 +32,5 @@ compat_sed "s/#UseDNS.*/UseDNS no/" "/etc/ssh/sshd_config"
 compat_sed "s/root:!/root:\*/g" /etc/shadow
 service sshd reload
 compat_useradd "john"
-which "apk" >/dev/null && apk add shadow
+
+(test "$(compat_which "apk")" && apk add shadow) || true
