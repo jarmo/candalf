@@ -17,6 +17,7 @@ install() {
     (test "$(compat_which apt)" && apt install -y "$PACKAGE") || \
     (test "$(compat_which pkg)" && pkg install -y "$PACKAGE") || \
     (test "$(compat_which apk)" && apk add "$PACKAGE") || \
+    (test "$(compat_which pacman)" && pacman -S --noconfirm "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
 

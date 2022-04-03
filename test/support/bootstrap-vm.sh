@@ -29,8 +29,9 @@ compat_useradd() {
 cp -R /home/vagrant/.ssh /root
 compat_sed "s/#PermitRootLogin.*/PermitRootLogin yes/" "/etc/ssh/sshd_config"
 compat_sed "s/#UseDNS.*/UseDNS no/" "/etc/ssh/sshd_config"
-compat_sed "s/root:!/root:\*/g" /etc/shadow
-service sshd reload
+test -f /etc/shadow && compat_sed "s/root:!/root:\*/g" /etc/shadow
+(test "$(compat_which "service")" && service sshd reload) || \
+  (test "$(compat_which "systemctl")" && systemctl reload sshd)
 compat_useradd "john"
 
 (test "$(compat_which "apk")" && apk add shadow) || true
