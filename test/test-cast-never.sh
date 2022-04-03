@@ -15,7 +15,7 @@ test_cast_never() {
   create_spell "$BOOK_PATH" "spells/timestamp.sh" "date +%s%N > ~/timestamp" "CAST_NEVER=1"
   create_spell_for "john" "$BOOK_PATH" "spells/timestamp.sh" "date +%s%N > ~/timestamp" "CAST_NEVER=1"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_file_not_exists "/root/timestamp"
   assert_logged "Casting.*timestamp\.sh completed as the user root"

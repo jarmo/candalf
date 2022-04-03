@@ -7,7 +7,7 @@
 # presumably is outside of Windows file-system and allows setting file
 # permissions properly for SSH.
 def prepare_ssh_for_wsl(ssh_config)
-  private_key_path = "/tmp/candalf-test"
+  private_key_path = "/tmp/candalf.test"
   FileUtils.cp "support/ssh/private-key", private_key_path
   FileUtils.chmod 0600, private_key_path
   ssh_config.private_key_path = private_key_path
@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
   prepare_ssh_for_wsl(config.ssh)
 
   config.vm.define "candalf-test" do |vm_config|
-    vm_config.vm.hostname = "candalf-test"
+    vm_config.vm.hostname = "candalf.test"
   end
 
   config.vm.provider "virtualbox" do |v|

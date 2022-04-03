@@ -11,7 +11,7 @@ TEST_DIR="${TEST_DIR:-"$(dirname "$(readlink -f "$0")")"}"
 . "${TEST_DIR}/support/assertions.sh"
 
 test_example() {
-  candalf candalf-test ../example/example-book.sh
+  candalf candalf.test ../example/example-book.sh
 
   assert_logged "Casting.*completed"
   assert_not_logged "(Failed|Skipping)"

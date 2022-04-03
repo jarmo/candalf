@@ -17,7 +17,7 @@ test_env_vars() {
 
   CANDALF_TEST_ENV_VAR="from-candalf-test" \
     FOO_BAR="not-passed-var" \
-    candalf candalf-test "$BOOK_PATH"
+    candalf candalf.test "$BOOK_PATH"
 
   assert_file_contains "/root/env.vars" "from-candalf-test"
   assert_file_not_contains "/root/env.vars" "not-passed-var"

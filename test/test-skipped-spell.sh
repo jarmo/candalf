@@ -15,7 +15,7 @@ test_skipped_spell() {
   create_spell "$BOOK_PATH" "spells/timestamp.sh" "date +%s%N > ~/timestamp"
   create_spell_for "john" "$BOOK_PATH" "spells/timestamp.sh" "date +%s%N > ~/timestamp"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   ROOT_FILE_CONTENT=$(file_content "/root/timestamp")
   assert_not_empty "$ROOT_FILE_CONTENT"
@@ -24,7 +24,7 @@ test_skipped_spell() {
   assert_not_empty "$USER_FILE_CONTENT"
 
   reset_log
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_logged "Skipping.*timestamp\.sh since it has been cast already as the user root"
   assert_logged "Skipping.*timestamp\.sh since it has been cast already as the user john"
@@ -35,7 +35,7 @@ test_skipped_spell() {
   echo "echo new-line > ~/foo" >> "$(dirname "$BOOK_PATH")/spells/timestamp.sh"
 
   reset_log
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_not_logged "Skipping"
 

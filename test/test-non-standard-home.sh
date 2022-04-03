@@ -16,7 +16,7 @@ test_non_standard_home() {
   create_spell "$BOOK_PATH" "spells/whoami.sh" "whoami > ~/me"
   create_spell_for "john" "$BOOK_PATH" "spells/whoami.sh" "whoami > ~/me"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_file_contains "/root/me" "root"
   assert_file_contains "/var/lib/john/me" "john"

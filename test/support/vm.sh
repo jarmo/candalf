@@ -35,10 +35,10 @@ vm_restore() {
 
 vm_exec() {
   CMD="${1:?"CMD is required!"}"
-  ssh -q -F "$TEST_DIR/support/ssh/config" candalf-test "${CMD}"
+  ssh -q -F "$TEST_DIR/support/ssh/config" candalf.test "${CMD}"
 }
 
 vm_is_running() {
-  nc -z candalf-test 2222
+  nc -z candalf.test 2222
 }
 

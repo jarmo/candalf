@@ -50,7 +50,7 @@ fail_test() {
 }
 
 create_book() {
-  BOOK_DIR_PATH="/tmp/candalf-test-book"
+  BOOK_DIR_PATH="/tmp/candalf.test-book"
   rm -rf "$BOOK_DIR_PATH"
   mkdir -p "$BOOK_DIR_PATH"
 

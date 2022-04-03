@@ -594,9 +594,9 @@ Some prerequisites need to be fulfilled before running tests:
    described in [.tool-versions](.tool-versions).
 2. Install [VirtualBox](https://www.virtualbox.org).
 3. Install [Vagrant](https://www.vagrantup.com).
-4. Modify `/etc/hosts` so that `candalf-test` would point against your local machine:
+4. Modify `/etc/hosts` so that `candalf.test` would point against your local machine:
 ```bash
-$ echo "127.0.0.1 candalf-test" | sudo tee -a /etc/hosts
+$ echo "127.0.0.1 candalf.test" | sudo tee -a /etc/hosts
 ```
 
 To run all the tests against all supported virtual machines (see [Makefile](Makefile)),

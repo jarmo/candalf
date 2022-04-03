@@ -15,7 +15,7 @@ test_cast_always() {
   create_spell "$BOOK_PATH" "spells/random.sh" "echo \$RANDOM > ~/random" "CAST_ALWAYS=1"
   create_spell_for "john" "$BOOK_PATH" "spells/random.sh" "echo \$RANDOM > ~/random" "CAST_ALWAYS=1"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   ROOT_FILE_CONTENT=$(file_content "/root/random")
   assert_not_empty "$ROOT_FILE_CONTENT"
@@ -23,7 +23,7 @@ test_cast_always() {
   USER_FILE_CONTENT=$(file_content "/home/john/random")
   assert_not_empty "$USER_FILE_CONTENT"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_file_not_contains "/root/random" "$ROOT_FILE_CONTENT"
   assert_file_not_contains "/home/john/random" "$USER_FILE_CONTENT"

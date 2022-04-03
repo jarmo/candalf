@@ -15,7 +15,7 @@ test_failing_spell() {
   create_spell "$BOOK_PATH" "spells/failing.sh" "totally-invalid-command"
   create_spell "$BOOK_PATH" "spells/env.sh" "env"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_logged "Failed.*failing\.sh"
   assert_not_logged "env\.sh"
@@ -26,7 +26,7 @@ test_failing_spell_for_user() {
   create_spell_for "john" "$BOOK_PATH" "spells/failing.sh" "totally-invalid-command"
   create_spell_for "john" "$BOOK_PATH" "spells/env.sh" "env"
 
-  candalf candalf-test "$BOOK_PATH"
+  candalf candalf.test "$BOOK_PATH"
 
   assert_logged "Failed.*failing\.sh"
   assert_not_logged "env\.sh"

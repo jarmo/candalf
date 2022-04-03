@@ -15,7 +15,7 @@ test_dry_run() {
   create_spell "$BOOK_PATH" "spells/text.sh" "echo 'hello root'> ~/text"
   create_spell_for "john" "$BOOK_PATH" "spells/text.sh" "echo 'hello john' > ~/text"
 
-  candalf --dry-run candalf-test "$BOOK_PATH"
+  candalf --dry-run candalf.test "$BOOK_PATH"
 
   assert_file_not_exists "/root/text"
   assert_file_not_exists "/home/john/text"
