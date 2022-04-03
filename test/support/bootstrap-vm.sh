@@ -21,8 +21,8 @@ compat_which() {
 compat_useradd() {
   USER="$1"
   (test "$(compat_which "useradd")" && useradd -m "$USER") || \
-    (test "$(compat_which "adduser")" && adduser -D "$USER") || \
     (test "$(compat_which "pw")" && pw useradd -mn "$USER") || \
+    (test "$(compat_which "adduser")" && adduser -D "$USER") || \
     (echo "No useradd binaries detected" && exit 1)
 }
 
