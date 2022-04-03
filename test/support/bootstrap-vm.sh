@@ -11,18 +11,11 @@ compat_sed() {
     sed -i "" -e "$SUBSITUTION_CMD" "$EDITED_FILE"
 }
 
-compat_which() {
-  BINARY="$1"
-
-  which "$BINARY" 2>/dev/null || \
-    whereis "$BINARY" 2>/dev/null | awk '{print $2}'
-}
-
 compat_useradd() {
   USER="$1"
-  (test "$(compat_which "useradd")" && useradd -m "$USER") || \
-    (test "$(compat_which "pw")" && pw useradd -mn "$USER") || \
-    (test "$(compat_which "adduser")" && adduser -D "$USER") || \
+  (command -v useradd > /dev/null && useradd -m "$USER") || \
+    (command -v pw > /dev/null && pw useradd -mn "$USER") || \
+    (command -v adduser && adduser -D "$USER") || \
     (echo "No useradd binaries detected" && exit 1)
 }
 
@@ -30,8 +23,8 @@ cp -R /home/vagrant/.ssh /root
 compat_sed "s/#PermitRootLogin.*/PermitRootLogin yes/" "/etc/ssh/sshd_config"
 compat_sed "s/#UseDNS.*/UseDNS no/" "/etc/ssh/sshd_config"
 test -f /etc/shadow && compat_sed "s/root:!/root:\*/g" /etc/shadow
-(test "$(compat_which "service")" && service sshd reload) || \
-  (test "$(compat_which "systemctl")" && systemctl reload sshd)
+(command -v service > /dev/null && service sshd reload) || \
+  (command -v systemctl > /dev/null && systemctl reload sshd)
 compat_useradd "john"
 
-(test "$(compat_which "apk")" && apk add shadow) || true
+(command -v apk > /dev/null && apk add shadow) || true
