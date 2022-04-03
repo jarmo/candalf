@@ -34,6 +34,7 @@ manually in case of any problems.
   - FreeBSD
   - Arch Linux
   - CentOS
+  - Fedora Linux
   - Alpine Linux
   - Any other similar operating system
 * Adding support to a new Linux/Unix-like OS is quite easy thanks to [tests](test).
