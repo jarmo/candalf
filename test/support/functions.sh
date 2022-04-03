@@ -5,14 +5,14 @@ set -Eeuo pipefail
 VAGRANT_BOX="${VAGRANT_BOX:-"generic/ubuntu2110"}"
 
 TEST_DIR="${TEST_DIR:?"TEST_DIR is required!"}"
+TRAPS_SET="${TRAPS_SET:-""}"
+
 # shellcheck source=test/support/vm.sh
 . "${TEST_DIR}/support/vm.sh"
 # shellcheck source=lib/colors.sh
 . "${TEST_DIR}/../lib/colors.sh"
 
 before_all() {
-  trap fail_test INT ERR
-  trap after_all EXIT
   vm_prepare
 }
 
@@ -23,12 +23,20 @@ candalf() {
 
 before_each() {
   cd "$TEST_DIR"
+
+  [[ ! "$TRAPS_SET" ]] && set_traps
   vm_restore || before_all
 }
 
 after_all() {
   cd "$TEST_DIR"
   vm_destroy
+}
+
+set_traps() {
+  trap fail_test INT ERR
+  trap after_all EXIT
+  TRAPS_SET=1
 }
 
 fail_test() {
