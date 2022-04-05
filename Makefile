@@ -36,6 +36,6 @@ test-example:
 	VAGRANT_BOX=generic/${CENTOS} test/test-example.sh
 	VAGRANT_BOX=generic/${FEDORA_LINUX} test/test-example.sh
 
-test: shellcheck test-alpine test-ubuntu test-freebsd test-arch test-centos test-fedora test-example
+test: shellcheck test-alpine test-ubuntu test-freebsd test-arch test-centos test-fedora
 
 .PHONY: all shellcheck test-alpine test-ubuntu test-freebsd test-arch test-centos test-fedora test-example test
