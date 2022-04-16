@@ -8,7 +8,7 @@ CENTOS = centos8
 FEDORA_LINUX = fedora35
 
 shellcheck:
-	shellcheck -V && shellcheck `find . -name "*.sh"`
+	shellcheck -V && shellcheck `find . -name "*.sh" | grep -v test-book`
 
 test-alpine:
 	VAGRANT_BOX=generic/${ALPINE_LINUX} test/test-all.sh

@@ -4,8 +4,7 @@ VERBOSE="${VERBOSE:-""}"
 test "$VERBOSE" && set -x
 set -Eeuo pipefail
 
-# shellcheck disable=SC2016
-CANDALF_REMOTE_ROOT='$HOME/.candalf'
+CANDALF_REMOTE_ROOT=".candalf"
 SSH_OUTPUT_FLAG=$(test "$VERBOSE" && echo "-v" || echo "-q")
 
 CANDALF_SSH_CONFIG_PATH="${CANDALF_SSH_CONFIG_PATH:-""}"
@@ -33,10 +32,14 @@ candalf() {
     -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
   cd - >/dev/null
 
-  # shellcheck disable=SC2154,SC2029,SC2086
+  # shellcheck disable=SC2086
   ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
-    env "${candalfEnvVars[@]-}" CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE" \
-      "bash -c '$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME 2>&1' | tee -a /var/log/candalf.log"
+    "$(shellescape env "${candalfEnvVars[@]-}" CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE")" \
+    bash -c "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME 2>&1 | tee -a /var/log/candalf.log"
+}
+
+shellescape() {
+  printf "%q " "$@"
 }
 
 bootstrap() {

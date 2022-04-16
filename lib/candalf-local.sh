@@ -6,10 +6,6 @@ set -Eeuo pipefail
 
 CANDALF_REMOTE_ROOT="$HOME/.candalf"
 
-# shellcheck source=lib/candalf-env.sh
-. "$CANDALF_ROOT"/lib/candalf-env.sh
-eval "$(candalfEnv)"
-
 candalf() {
   SPELL_BOOK="${2:?"SPELL_BOOK not set!"}"
   SPELL_BOOK_PATH="$(realpath "$SPELL_BOOK")"
@@ -25,7 +21,7 @@ candalf() {
   cd - >/dev/null
 
   # shellcheck disable=SC2154
-  env "${candalfEnvVars[@]-}" CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE" \
+  env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE" \
     bash -c "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME" 2>&1 | tee -a /var/log/candalf.log
 }
 
