@@ -50,7 +50,7 @@ fail_test() {
 }
 
 create_book() {
-  BOOK_DIR_PATH="$TEST_DIR/test-book"
+  BOOK_DIR_PATH="$TEST_DIR/.test-book"
   rm -rf "$BOOK_DIR_PATH"
   mkdir -p "$BOOK_DIR_PATH"
 
