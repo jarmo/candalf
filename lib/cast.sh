@@ -51,7 +51,7 @@ function cast_as() {
 
   # shellcheck disable=SC2154
   sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" \
-    bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $SPELL_FILE"
+    bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $(printf "%q" "$SPELL_FILE")"
 }
 
 function _cast() {
@@ -61,7 +61,7 @@ function _cast() {
       cd
       echo
       trap log_error INT ERR
-      ${SPELL_PATH}
+      "${SPELL_PATH}"
       trap - INT ERR
       echo
     else

@@ -105,7 +105,7 @@ add_spell_to_book() {
   BOOK_PATH="${2:?"BOOK_PATH is required!"}"
   CAST_FLAGS="${3:-""}"
 
-  echo "$CAST_FLAGS cast $SPELL_PATH" >> "$BOOK_PATH"
+  echo "$CAST_FLAGS cast \"$SPELL_PATH\"" >> "$BOOK_PATH"
 }
 
 add_spell_to_book_for() {
@@ -114,7 +114,7 @@ add_spell_to_book_for() {
   BOOK_PATH="${3:?"BOOK_PATH is required!"}"
   CAST_FLAGS="${4:-""}"
 
-  echo "$CAST_FLAGS cast_as $CAST_AS_USER $SPELL_PATH" >> "$BOOK_PATH"
+  echo "$CAST_FLAGS cast_as $CAST_AS_USER \"$SPELL_PATH\"" >> "$BOOK_PATH"
 }
 
 file_content() {

@@ -29,17 +29,18 @@ candalf() {
 
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
-    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" "$CANDALF_SERVER":"$CANDALF_SPELLS_ROOT"
+    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" "$CANDALF_SERVER":"$(printf "%q" "$CANDALF_SPELLS_ROOT")"
   cd - >/dev/null
 
   # shellcheck disable=SC2086
   ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
-    "$(shellescape env "${candalfEnvVars[@]-}" CANDALF_ROOT="$CANDALF_REMOTE_ROOT" CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" CANDALF_DRY_RUN="$CANDALF_DRY_RUN" VERBOSE="$VERBOSE")" \
-    bash -c "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME 2>&1 | tee -a /var/log/candalf.log"
-}
-
-shellescape() {
-  printf "%q " "$@"
+    "$(printf "%q " \
+    env "${candalfEnvVars[@]-}" \
+        CANDALF_ROOT="$CANDALF_REMOTE_ROOT" \
+        CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
+        CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \
+        VERBOSE="$VERBOSE")" \
+      bash -c "'$(printf "%q" "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME") 2>&1 | tee -a /var/log/candalf.log'"
 }
 
 bootstrap() {
