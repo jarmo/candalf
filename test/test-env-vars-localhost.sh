@@ -18,7 +18,7 @@ test_env_vars_localhost() {
   vm_exec "sudo -H CANDALF_TEST_ENV_VAR='from-candalf-test' \
     CANDALF_ANOTHER_TEST_ENV_VAR='variable with spaces' \
     FOO_BAR='maybe-passed-var' \
-    /candalf/candalf.sh localhost /candalf/test/test-book/$(basename "$BOOK_PATH")"
+    /candalf/candalf.sh localhost /candalf/test/.test-book/$(basename "$BOOK_PATH")"
 
   assert_file_contains "/root/env.vars" "from-candalf-test"
   assert_file_contains "/root/env.vars" "variable with spaces"
