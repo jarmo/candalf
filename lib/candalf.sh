@@ -40,7 +40,8 @@ candalf() {
         CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
         CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \
         VERBOSE="$VERBOSE")" \
-      bash -c "'$(printf "%q" "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME") 2>&1 | tee -a /var/log/candalf.log'"
+      bash -o pipefail \
+        -c "'$(printf "%q" "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME") 2>&1 | tee -a /var/log/candalf.log'"
 }
 
 bootstrap() {

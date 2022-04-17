@@ -10,18 +10,18 @@ TEST_DIR="${TEST_DIR:-"$(dirname "$(readlink -f "$0")")"}"
 # shellcheck source=test/support/assertions.sh
 . "${TEST_DIR}/support/assertions.sh"
 
-test_failing_spell() {
+test_failing_spell_localhost() {
   BOOK_PATH=$(create_book)
   create_spell "$BOOK_PATH" "spells/failing.sh" "totally-invalid-command"
   create_spell "$BOOK_PATH" "spells/env.sh" "env"
 
-  candalf candalf.test "$BOOK_PATH" || true
+  candalf_local "/candalf/test/.test-book/$(basename "$BOOK_PATH")" || true
 
   assert_logged "Failed.*failing\.sh"
   assert_not_logged "env\.sh"
 }
 
-test_failing_spell_for_user() {
+test_failing_spell_for_user_localhost() {
   BOOK_PATH=$(create_book)
   create_spell_for "john" "$BOOK_PATH" "spells/failing.sh" "totally-invalid-command"
   create_spell_for "john" "$BOOK_PATH" "spells/env.sh" "env"
@@ -32,5 +32,5 @@ test_failing_spell_for_user() {
   assert_not_logged "env\.sh"
 }
 
-run_test "test_failing_spell"
-run_test "test_failing_spell_for_user"
+run_test "test_failing_spell_localhost"
+run_test "test_failing_spell_for_user_localhost"
