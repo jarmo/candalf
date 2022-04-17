@@ -53,6 +53,14 @@ assert_file_not_contains() {
   ! vm_exec "grep -qE '$REGEXP' '$FILE_PATH'"
 }
 
+assert_file_exists() {
+  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+
+  FILE_PATH="${1:?"FILE_PATH is required!"}"
+
+  vm_exec "test -e $FILE_PATH"
+}
+
 assert_file_not_exists() {
   echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
 

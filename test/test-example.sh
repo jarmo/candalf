@@ -16,7 +16,9 @@ test_example() {
   assert_logged "Casting.*completed"
   assert_not_logged "(Failed|Skipping)"
 
-  assert_file_content "/root/today" "$(date +"%Y-%m-%d")"
+  assert_file_exists "/root/today"
+  assert_not_empty "$(file_content "/root/today")"
+
   assert_file_content "/root/me" "root"
   assert_file_content "/home/john/me" "john"
 
