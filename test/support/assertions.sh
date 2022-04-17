@@ -70,6 +70,8 @@ assert_file_not_exists() {
 }
 
 assert_not_empty() {
+  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+
   VALUE="$1"
 
   test "$VALUE" != ""
