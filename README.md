@@ -607,6 +607,12 @@ execute the following command:
 $ make test
 ```
 
+To run a single test against all supported virtual machines, execute the
+following command:
+```
+$ make test-one TEST=test/test-example.sh
+```
+
 To execute a single test against an Ubuntu Linux VM:
 ```
 $ test/test-[NAME].sh
@@ -624,14 +630,19 @@ Tests have been run on Ubuntu Linux and might not work from anywhere else.
 
 ### Writing and Troubleshooting Tests
 
+All test file names need to be prefixed with `test-` and they have to reside
+under [test]() directory. Easiest way to write a test is to copy an existing
+test into a new test file and then modify it according to your needs.
+
 Running any test creates a VM from scratch, creates a snapshot and restores to
-that snapshot when multiple tests are run. After all tests have been ran or test has failed, that VM will be destroyed.
+that snapshot when multiple tests are run. After all tests have been run or
+test has failed, that VM will be destroyed.
 This is good practice to avoid creating tests which depend on each-other.
 
 However during troubleshooting or writing new tests this approach uses too much
 time. For this there is an environment variable `KEEP_VM=1` which, when enabled,
 does not destroy VM nor restore it from the snapshot. This allows instantaneous
-test executions. Use like this:
+test executions. Use it like this:
 ```bash
 $ KEEP_VM=1 ./test/test-example.sh
 ```
