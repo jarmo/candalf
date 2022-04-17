@@ -38,6 +38,10 @@ vm_exec() {
   ssh -q -F "$TEST_DIR/support/ssh/config" candalf.test "${CMD}"
 }
 
+vm_rsync() {
+  vagrant rsync
+}
+
 vm_is_running() {
   nc -z candalf.test 2222
 }

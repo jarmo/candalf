@@ -21,6 +21,15 @@ candalf() {
     "$TEST_DIR"/../candalf.sh "${@}"
 }
 
+candalf_local() {
+  BOOK_PATH="$1"; shift
+  ARGS=(VERBOSE="$VERBOSE")
+  ARGS+=("${@}")
+
+  vm_rsync
+  vm_exec "sudo -H $(printf "%q " "${ARGS[@]}") /candalf/candalf.sh localhost \"$BOOK_PATH\""
+}
+
 before_each() {
   cd "$TEST_DIR"
 

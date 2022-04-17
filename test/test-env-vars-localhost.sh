@@ -15,10 +15,10 @@ test_env_vars_localhost() {
   create_spell "$BOOK_PATH" "spells/env-vars.sh" "env > ~/env.vars; echo -n \$CANDALF_TEST_ENV_VAR > ~/candalf.env; echo -n \$CANDALF_ANOTHER_TEST_ENV_VAR > ~/candalf-another.env"
   create_spell_for "john" "$BOOK_PATH" "spells/env-vars.sh" "env > ~/env.vars; echo -n \$CANDALF_TEST_ENV_VAR > ~/candalf.env; echo -n \$CANDALF_ANOTHER_TEST_ENV_VAR > ~/candalf-another.env"
 
-  vm_exec "sudo -H CANDALF_TEST_ENV_VAR='from-candalf-test' \
+  candalf_local "/candalf/test/.test-book/$(basename "$BOOK_PATH")" \
+    CANDALF_TEST_ENV_VAR='from-candalf-test' \
     CANDALF_ANOTHER_TEST_ENV_VAR='variable with spaces' \
-    FOO_BAR='maybe-passed-var' \
-    /candalf/candalf.sh localhost /candalf/test/.test-book/$(basename "$BOOK_PATH")"
+    FOO_BAR='maybe-passed-var'
 
   assert_file_contains "/root/env.vars" "from-candalf-test"
   assert_file_contains "/root/env.vars" "variable with spaces"

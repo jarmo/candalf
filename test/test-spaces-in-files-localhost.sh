@@ -17,7 +17,7 @@ test_spaces_in_files_localhost() {
   NEW_BOOK_PATH="$(dirname "$BOOK_PATH")/book with space.sh"
   mv "$BOOK_PATH" "$NEW_BOOK_PATH"
 
-  vm_exec "sudo -H /candalf/candalf.sh localhost \"/candalf/test/.test-book/$(basename "$NEW_BOOK_PATH")\""
+  candalf_local "/candalf/test/.test-book/$(basename "$NEW_BOOK_PATH")"
 
   assert_file_content "/root/done" "done"
   assert_file_content "/home/john/done" "done"
