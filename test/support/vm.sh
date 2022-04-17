@@ -5,6 +5,7 @@ set -Eeuo pipefail
 TEST_DIR="${TEST_DIR:?"TEST_DIR is required!"}"
 KEEP_VM="${KEEP_VM:-""}"
 SNAPSHOT_NAME="pristine"
+CURRENT_BOX_FILE="$TEST_DIR/.vagrantbox"
 
 vm_prepare() {
   # Enable Vagrant on Windows WSL too
@@ -12,6 +13,7 @@ vm_prepare() {
   export PATH="/mnt/c/Program Files/Oracle/VirtualBox:$PATH"
 
   vm_destroy
+  echo "$VAGRANT_BOX" > "$CURRENT_BOX_FILE"
   vm_start
   vm_save
 }
@@ -21,7 +23,7 @@ vm_start() {
 }
 
 vm_destroy() {
-  [[ "$KEEP_VM" = 1 ]] || vagrant destroy --force
+  ([[ "$KEEP_VM" = 1 ]] && vm_box_same) || vagrant destroy --force
 }
 
 vm_save() {
@@ -43,6 +45,10 @@ vm_rsync() {
 }
 
 vm_is_running() {
-  nc -z candalf.test 2222
+  vm_box_same && nc -z candalf.test 2222
+}
+
+vm_box_same() {
+  [[ -f "$CURRENT_BOX_FILE" && "$(cat "$CURRENT_BOX_FILE")" = "$VAGRANT_BOX" ]]
 }
 
