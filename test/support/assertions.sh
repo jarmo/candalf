@@ -9,7 +9,7 @@ TEST_DIR="${TEST_DIR:?"TEST_DIR is required!"}"
 . "${TEST_DIR}/support/functions.sh"
 
 assert_not_logged() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   REGEXP="${1:?"REGEXP is required!"}"
 
@@ -17,7 +17,7 @@ assert_not_logged() {
 }
 
 assert_logged() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   REGEXP="${1:?"REGEXP is required!"}"
 
@@ -25,7 +25,7 @@ assert_logged() {
 }
 
 assert_file_content() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   FILE_PATH="${1:?"FILE_PATH is required!"}"
   EXPECTED_CONTENT="${2:?"EXPECTED_CONTENT is required!"}"
@@ -36,7 +36,7 @@ assert_file_content() {
 }
 
 assert_file_contains() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   FILE_PATH="${1:?"FILE_PATH is required!"}"
   REGEXP="${2:?"REGEXP is required!"}"
@@ -45,7 +45,7 @@ assert_file_contains() {
 }
 
 assert_file_not_contains() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   FILE_PATH="${1:?"FILE_PATH is required!"}"
   REGEXP="${2:?"REGEXP is required!"}"
@@ -54,7 +54,7 @@ assert_file_not_contains() {
 }
 
 assert_file_exists() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   FILE_PATH="${1:?"FILE_PATH is required!"}"
 
@@ -62,7 +62,7 @@ assert_file_exists() {
 }
 
 assert_file_not_exists() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   FILE_PATH="${1:?"FILE_PATH is required!"}"
 
@@ -70,9 +70,13 @@ assert_file_not_exists() {
 }
 
 assert_not_empty() {
-  echo -e "${COLOR_YELLOW}${FUNCNAME[0]} ${*}${COLOR_END}"
+  _log "$@"
 
   VALUE="$1"
 
   test "$VALUE" != ""
+}
+
+_log() {
+  echo -e "${COLOR_YELLOW}${FUNCNAME[1]} ${*}${COLOR_END}"
 }
