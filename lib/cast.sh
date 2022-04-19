@@ -7,7 +7,6 @@ set -Eeuo pipefail
 . "$CANDALF_ROOT"/lib/colors.sh
 # shellcheck source=lib/candalf-env.sh
 . "$CANDALF_ROOT"/lib/candalf-env.sh
-eval "$(candalfEnv)"
 
 function cast() {
   SPELL_FILE="${1:?"SPELL_FILE not set!"}"
@@ -48,6 +47,8 @@ function cast_as() {
   rsync -Rac "$SPELL_BOOK_NAME/$SPELL_FILE" "$USER_CANDALF_ROOT"
   chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
   cd - >/dev/null
+
+  eval "$(candalfEnv)"
 
   # shellcheck disable=SC2154
   sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" HISTFILE=/dev/null \
