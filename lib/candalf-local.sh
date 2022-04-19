@@ -22,7 +22,8 @@ candalf() {
 
   # shellcheck disable=SC2154
   env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" \
-    CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT"\
+    CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
+    HISTFILE=/dev/null \
     bash -c "$(printf "%q" "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME")" 2>&1 | tee -a /var/log/candalf.log
 }
 

@@ -39,6 +39,7 @@ candalf() {
         CANDALF_ROOT="$CANDALF_REMOTE_ROOT" \
         CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
         CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \
+        HISTFILE=/dev/null \
         VERBOSE="$VERBOSE")" \
       bash -o pipefail \
         -c "'$(printf "%q" "$CANDALF_SPELLS_ROOT/$SPELL_BOOK_BASENAME") 2>&1 | tee -a /var/log/candalf.log'"

@@ -66,7 +66,7 @@ create_book() {
   BOOK_PATH="${BOOK_DIR_PATH}/book.sh"
 
   cat << EOF > "${BOOK_PATH}"
-#!/usr/bin/env bash
+$(shebang)
 
 test "\$VERBOSE" && set -x
 set -Eeo pipefail
@@ -93,7 +93,7 @@ create_spell_for() {
 
   mkdir -p "$(dirname "$SPELL_FULL_PATH")"
   cat << EOF > "${SPELL_FULL_PATH}"
-#!/usr/bin/env bash
+$(shebang)
 
 test "\$VERBOSE" && set -x
 set -Eeo pipefail
@@ -106,6 +106,14 @@ EOF
     add_spell_to_book "$SPELL_PATH" "$BOOK_PATH" "$CAST_FLAGS"
   else
     add_spell_to_book_for "$CAST_AS_USER" "$SPELL_PATH" "$BOOK_PATH" "$CAST_FLAGS"
+  fi
+}
+
+shebang() {
+  if [[ "$VAGRANT_BOX" = *alpine* ]]; then
+    echo "#!/usr/bin/env bash"
+  else
+    echo "#!/usr/bin/env -S bash -i"
   fi
 }
 
@@ -143,5 +151,15 @@ run_test() {
   echo -e "(${COLOR_GREY}${VAGRANT_BOX}${COLOR_END}) => ${COLOR_GREEN}!!! RUNNING !!!${COLOR_END} ${COLOR_YELLOW}${TEST_NAME}${COLOR_END}"
   ${TEST_NAME}
   echo -e "(${COLOR_GREY}${VAGRANT_BOX}${COLOR_END}) => ${COLOR_GREEN_BG}!!! PASSED !!!${COLOR_END} ${COLOR_YELLOW}${TEST_NAME}${COLOR_END}"
+}
+
+run_test_using_interactive_shell() {
+  TEST_NAME="${1:?"TEST_NAME is required!"}"
+
+  if test "$(shebang)" = "#!/usr/bin/env -S bash -i"; then
+    run_test "$TEST_NAME"
+  else
+    echo -e "(${COLOR_GREY}${VAGRANT_BOX}${COLOR_END}) => ${COLOR_YELLOW_BG}!!! SKIPPED !!!${COLOR_END} ${COLOR_YELLOW}${TEST_NAME}${COLOR_END} due to unsupported interactive shell shebang"
+  fi
 }
 
