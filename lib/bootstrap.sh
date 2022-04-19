@@ -10,7 +10,7 @@ install() {
     (command -v apt >/dev/null && apt install -y "$PACKAGE") || \
     (command -v pkg >/dev/null && pkg install -y "$PACKAGE") || \
     (command -v apk >/dev/null && apk add "$PACKAGE") || \
-    (command -v pacman >/dev/null && pacman -S --noconfirm "$PACKAGE") || \
+    (command -v pacman >/dev/null && pacman -Sy --noconfirm "$PACKAGE") || \
     (command -v yum >/dev/null && yum install -y "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
