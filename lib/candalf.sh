@@ -35,7 +35,7 @@ candalf() {
   # shellcheck disable=SC2086
   ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
     "$(printf "%q " \
-    env "${candalfEnvVars[@]-}" \
+    env "${candalfEnvVars[@]}" \
         CANDALF_ROOT="$CANDALF_REMOTE_ROOT" \
         CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
         CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \

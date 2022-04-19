@@ -50,7 +50,7 @@ function cast_as() {
   cd - >/dev/null
 
   # shellcheck disable=SC2154
-  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]-}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" \
+  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" \
     bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $(printf "%q" "$SPELL_FILE")"
 }
 
