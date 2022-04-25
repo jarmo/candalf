@@ -36,6 +36,7 @@ candalf() {
   ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
     "$(printf "%q " \
     env "${candalfEnvVars[@]}" \
+        CANDALF_SERVER="$CANDALF_SERVER" \
         CANDALF_ROOT="$CANDALF_REMOTE_ROOT" \
         CANDALF_SPELLS_ROOT="$CANDALF_SPELLS_ROOT" \
         CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \
