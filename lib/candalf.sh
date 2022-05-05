@@ -74,9 +74,18 @@ bootstrap() {
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
 
-  trap "kill_ssh_agent" ERR EXIT
-  eval "$(ssh-agent -s)" >/dev/null
-  ssh-add -t 300 "$SSH_KEY_PATH" 2>/dev/null
+  SSH_PUBLIC_KEY_PATH="$SSH_KEY_PATH.pub"
+  if [[ ! -f "$SSH_PUBLIC_KEY_PATH" ]]; then
+    echo "Extracting SSH public key from private key"
+    SSH_PUBLIC_KEY="$(ssh-keygen -y -f "$SSH_KEY_PATH")"
+    echo "$SSH_PUBLIC_KEY" > "$SSH_PUBLIC_KEY_PATH"
+  fi
+
+  if ! ssh-add -L | grep --quiet "$(cat "$SSH_PUBLIC_KEY_PATH")"; then
+    trap "kill_ssh_agent" ERR EXIT
+    eval "$(ssh-agent -s)" >/dev/null
+    ssh-add -t 120 "$SSH_KEY_PATH" 2>/dev/null
+  fi
 
   SSH_LOGIN_COMMAND="ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG -tt \
     -o PubkeyAuthentication=yes \
