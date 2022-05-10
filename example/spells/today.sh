@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-test  && set -x
+test "$VERBOSE" && set -x
 set -Eeo pipefail
 
 date +"%Y-%m-%d" > ~/today
