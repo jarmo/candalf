@@ -79,6 +79,7 @@ bootstrap() {
     echo "Extracting SSH public key from private key"
     SSH_PUBLIC_KEY="$(ssh-keygen -y -f "$SSH_KEY_PATH")"
     echo "$SSH_PUBLIC_KEY" > "$SSH_PUBLIC_KEY_PATH"
+    chmod 644 "$SSH_PUBLIC_KEY_PATH"
   fi
 
   if ! ssh-add -L | grep --quiet "$(cat "$SSH_PUBLIC_KEY_PATH")"; then
