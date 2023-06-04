@@ -20,7 +20,7 @@ Examples:
 }
 
 if [[ ${#} -eq 0 ]]; then
- usage
+  usage
 fi
 
 optspec=":dvnh-:"
