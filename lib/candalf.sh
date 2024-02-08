@@ -25,15 +25,15 @@ candalf() {
   CANDALF_SPELLS_ROOT="$CANDALF_REMOTE_ROOT/$SPELL_BOOK_BASENAME_WITHOUT_EXT"
 
   rsync "$SSH_OUTPUT_FLAG" -ac "$CANDALF_ROOT"/lib/cast.sh "$CANDALF_ROOT"/lib/candalf-env.sh "$CANDALF_ROOT"/lib/colors.sh \
-    -e "ssh -q $SSH_CONFIG_FLAG" "$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
+    -e "ssh -q $SSH_CONFIG_FLAG" root@"$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
-    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" "$CANDALF_SERVER":"$(printf "%q" "$CANDALF_SPELLS_ROOT")"
+    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" root@"$CANDALF_SERVER":"$(printf "%q" "$CANDALF_SPELLS_ROOT")"
   cd - >/dev/null
 
   # shellcheck disable=SC2086
-  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt "$CANDALF_SERVER" \
+  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG -tt root@"$CANDALF_SERVER" \
     "$(printf "%q " \
     env "${candalfEnvVars[@]}" \
         CANDALF_SERVER="$CANDALF_SERVER" \
@@ -137,7 +137,7 @@ EOF
   fi
 
   # shellcheck disable=SC2029,SC2086
-  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG "$CANDALF_SERVER" \
+  ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG root@"$CANDALF_SERVER" \
     env CANDALF_ROOT="$CANDALF_REMOTE_ROOT" sh < "$CANDALF_ROOT"/lib/bootstrap.sh
 }
 
