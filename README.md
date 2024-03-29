@@ -631,7 +631,7 @@ Tests have been run on Ubuntu Linux and might not work from anywhere else.
 ### Writing and Troubleshooting Tests
 
 All test file names need to be prefixed with `test-` and they have to reside
-under [test]() directory. Easiest way to write a test is to copy an existing
+under [test](test) directory. Easiest way to write a test is to copy an existing
 test into a new test file and then modify it according to your needs.
 
 Running any test creates a VM from scratch, creates a snapshot and restores to
