@@ -5,11 +5,11 @@ test "$VERBOSE" && set -x
 set -eu
 
 compat_sed() {
-  SUBSITUTION_CMD="$1"
+  SUBSTITUTION_CMD="$1"
   EDITED_FILE="$2"
 
-  sed -i "$SUBSITUTION_CMD" "$EDITED_FILE" 2>/dev/null || \
-    sed -i "" -e "$SUBSITUTION_CMD" "$EDITED_FILE"
+  sed -i "$SUBSTITUTION_CMD" "$EDITED_FILE" 2>/dev/null || \
+    sed -i "" -e "$SUBSTITUTION_CMD" "$EDITED_FILE"
 }
 
 echo "Disable password login to SSH server"
