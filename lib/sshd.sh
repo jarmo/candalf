@@ -21,5 +21,10 @@ compat_sed "s/.*AcceptEnv LANG LC_/#AcceptEnv LANG LC_/" /etc/ssh/sshd_config
 echo "Change SSH server port to $SSH_SERVER_PORT"
 compat_sed "s/^#Port 22/Port $SSH_SERVER_PORT/" /etc/ssh/sshd_config
 
+if command -v systemctl >/dev/null && [ -f /etc/systemd/system/sockets.target.wants/ssh.socket ]; then
+  compat_sed "s/.*ListenStream=22/#ListenStream=22/" /etc/systemd/system/sockets.target.wants/ssh.socket
+  systemctl daemon-reload
+fi
+
 echo "Restart SSH server"
 service ssh restart 2>/dev/null || service sshd restart
