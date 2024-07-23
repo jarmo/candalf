@@ -24,6 +24,7 @@ compat_sed "s/^#Port 22/Port $SSH_SERVER_PORT/" /etc/ssh/sshd_config
 if command -v systemctl >/dev/null && [ -f /etc/systemd/system/sockets.target.wants/ssh.socket ]; then
   compat_sed "s/.*ListenStream=22/#ListenStream=22/" /etc/systemd/system/sockets.target.wants/ssh.socket
   systemctl daemon-reload
+  systemctl enable ssh
 fi
 
 echo "Restart SSH server"
