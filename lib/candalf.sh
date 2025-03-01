@@ -109,7 +109,7 @@ bootstrap() {
     SSH_SERVER_PORT=$(grep -A 10 "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH" | grep "Port" | head -1 | cut -d " " -f4)
   fi    
 
-  if ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT"; then
+  if ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT" 2>/dev/null; then
     # shellcheck disable=SC2029,SC2086
     ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG \
       -o PubkeyAuthentication=yes \
