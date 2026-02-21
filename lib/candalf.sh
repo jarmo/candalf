@@ -69,7 +69,7 @@ bootstrap() {
       -o IdentitiesOnly=yes \
       -o PreferredAuthentications=password \
       root@"$CANDALF_SERVER" \
-      'echo "Logged successfully into $HOST for the first time, creating key"'
+      'echo "Logged successfully into $HOSTNAME for the first time, creating key"'
 
     ssh-keygen -a 100 -t ed25519 -f "$SSH_KEY_PATH" -C "$SSH_KEY_LABEL"
   fi
