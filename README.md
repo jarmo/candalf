@@ -43,17 +43,20 @@ manually in case of any problems.
 
 ## Dependencies
 
-To use Candalf to cast spells to a clean system, the following requirements need to be met:
+To use Candalf to cast spells to a clean **remote** system, the following requirements need to be met:
 
 * System should be running a **supported** OS;
 * SSH server should be running on port **22** and it should be accessible from your machine;
-* Logging in with **root password** over SSH should be allowed and enabled;
-* `rsync` needs to be installed on the current system (it will be installed automatically on the remote system when needed);
-* `bash` needs to be installed on the current system.
+* Logging in with **root password** over SSH should be allowed and enabled.
 
 When SSH server is running on a non-standard port already and/or password login is
-disabled then it is still possible to use Candalf, but some extra steps
+disabled then it is still possible to use Candalf, but some extra configuration steps
 are needed. See more in [Installation](#installation) section.
+
+
+To use Candalf to cast spells to a **local** system, the following requirements need to be met:
+* System should be running a **supported** OS;
+  - On **macOS** [Homebrew](https://brew.sh) needs to be installed.
 
 
 ## Installation
@@ -63,11 +66,12 @@ First, clone Candalf itself on your local system:
 git clone https://github.com/jarmo/candalf.git
 ```
 
+Then create a symlink:
 ```bash
-sudo ln -s $(realpath candalf/candalf.sh) /usr/local/bin/candalf
+sudo ln -s "$(pwd -P)candalf/candalf.sh" /usr/local/bin/candalf
 ```
 
-Create a separate project/directory for your server spell scripts:
+Create a separate project/directory for your spell scripts:
 ```bash
 mkdir -p example/spells
 ```
@@ -141,27 +145,27 @@ Host example.org
   PreferredAuthentications publickey
 ```
 
-There will be also SSH public/private key under `~/.ssh` having the server domain
-name as their file names (~/.ssh/example.org and ~/.ssh/example.org.pub respectively).
+There will be also SSH public/private keys under `~/.ssh` having the server domain
+name as their file names (`~/.ssh/example.org` and `~/.ssh/example.org.pub` respectively).
 
-See [example](example) for a simple spell book example.
+See [example](example) for a simple complete spell book example.
 
 
 ### Installation With Preconfigured SSH Server
 
-When server does not have password authentication enabled over SSH then it's
+When server does not have a password authentication enabled over SSH then it's
 easy to start using Candalf too. Just make sure that you have
 private/public key under `~/.ssh` having the same name as your server domain name
 and create a SSH configuration similar to shown above.
-This will make Candalf to assume that SSH authentication with a public key
+This will make Candalf to assume that SSH authentication configuration with a public key
 has been already completed and you can start using it normally.
 
 
 ## Spell Book
 
 A spell book script is required to cast spells to a system. This is basically a script which describes
-all the spells that should be cast on a remote system to configure and set it up - think of installing
-all necessary dependencies and configuring them as you would do manually.
+all the spells that should be cast on a local/remote system to configure and set it up - think of installing
+all necessary dependencies and configuring them as you would do manually from command line.
 
 Good practice would be not to do any changes manually on the remote system, but
 only use spell files and keep these in the VCS too for having a better understanding
@@ -212,8 +216,6 @@ set -Eeo pipefail
 
 apt update -y
 apt upgrade -y
-
-touch ~/upgrade-done
 EOF
 
 chmod +x spells/system/upgrade.sh
@@ -229,7 +231,7 @@ echo "cast spells/system/upgrade.sh" >> example-book.sh
 ```
 
 Let's cast all the defined spells (we assume that Candalf itself has been installed already
-as specified in the [Installation](#installation) section):
+as specified by the [Installation](#installation) section):
 ```bash
 candalf example.org example-book.sh
 ```
@@ -244,10 +246,11 @@ already cast this spell and will not do much again. However, as soon as you
 change that spell script then it will be cast again from the beginning to the
 end.
 
-**PS!** Spell book file name is used at the remote system for keeping track of
-spells - if you rename it then all the spells will be applied again. Make sure
-to rename all spell book directories on remote system before running candalf
-again after rename!
+**IMPORTANT!** Spell book file name is used at the remote system for keeping track of
+spells under `~/.candalf` - if you rename it then all the spells will be applied again. Make sure
+to rename all spell book directories on the remote system before running candalf
+again after rename operation (don't forget all of the non-privileged users' home directories too)!
+Use `--dry-run` flag to be sure that all was renamed as needed.
 
 
 ## Casting Spells for Unprivileged Users
@@ -296,7 +299,7 @@ CAST_ALWAYS=1 cast spells/upgrade.sh
 Candalf supports casting spells from multiple spell books. For example there
 might a be a base spell book, which is the same for every system and then
 a specific spell book for a specific system. They can be built on top of each
-other and then can be applied one by one or by specifying them one the same
+other and then can be applied one by one or by specifying them on the same
 command line where they will be applied from left to right:
 ```
 candalf example.org spell-book-one/base.sh spell-book-two/specific.sh
@@ -425,14 +428,16 @@ echo "Decrypted: $SECRET"
 EOF
 ```
 
-Note that instead of using `read` we now pass password to the `encpipe` via an
+Note that instead of using `read` command we now pass password to the `encpipe` via an
 envionrment variable `$CANDALF_PASSWORD`. It is also a good practice to bail
 out early with an error when that environment variable has not been set.
 
-Now, to execute candalf just specify password on the command line like this:
+Now, to execute candalf, just specify password on the command line like this:
 ```
-CANDALF_PASSWORD="encryption-password" candalf example.org example-book.sh
+   CANDALF_PASSWORD="encryption-password" candalf example.org example-book.sh
 ```
+Make sure that you run command like this with some spaces as a prefix so that shell does not preserve that into its history!
+
 
 ## Casting Spells Locally
 
@@ -445,15 +450,15 @@ sudo -H candalf localhost example-book.sh
 ```
 
 Running `candalf` requires **root** permissions so prefix it with `sudo -H` when
-not running as a root. Everything else is the same as running `candalf` regularly to cast spells to
+not running as a root. Everything else is the same as running `candalf` to cast spells to
 remote systems via SSH.
 
-SSH server does not need to be running to use Candalf on a local system.
+SSH server does not need to be running to use Candalf on a local system of course.
 
 
 ## Best Practices
 
-* Use `--dry-run` mode before casting spells for real to see what would happen
+* Use `--dry-run` flag before casting spells to see what would happen
 after your last changes.
 
 * Write spell scripts like you would write database migrations - keep in
@@ -465,7 +470,7 @@ and as specific as possible - instead of having one big spell script which
 does everything split it into multiple smaller logical ones.
 
 * Keep in mind that spells are applied in the order of declaration in the spell
-book script and no spells are cast after one fails.
+book script and no spells are cast after the one that fails.
 
 * When casting of a spell fails then pay close attention at what step did it fail
 because all previously executed commands in that spell script will be executed again on retry.
@@ -555,7 +560,7 @@ CAST_NEVER=1 cast spells/command.sh
 After running candalf then `spells/command.sh` will be marked as successfully
 ran and you can remove `CAST_NEVER=1` flag.
 
-However, using a solution like this should be a very last resort. Use a VM for
+However, using a solution like this should be the very last resort. Use a VM for
 testing and its snapshot functionality to avoid situations like this in the
 first place!
 
