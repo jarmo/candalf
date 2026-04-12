@@ -3,5 +3,5 @@
 test "$VERBOSE" && set -x
 set -Eeo pipefail
 
-whoami > ~/me
-cat ~/me
+whoami > ~/candalf-example-me
+cat ~/candalf-example-me
