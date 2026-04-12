@@ -14,6 +14,8 @@ function cast() {
   SPELL_PATH="$(realpath "$CANDALF_SPELLS_ROOT/$SPELL_FILE")"
   CAST_ALWAYS="${CAST_ALWAYS:-""}"
   CAST_NEVER="${CAST_NEVER:-""}"
+  CANDALF_DRY_RUN="${CANDALF_DRY_RUN:-""}"
+
   log "${COLOR_GREEN}Casting${COLOR_END} spell ${COLOR_YELLOW}$SPELL_PATH${COLOR_END} as the user ${COLOR_MAGENTA}$USER${COLOR_END}"
   if [[ "$CAST_ALWAYS" != "1" && -f "$SPELL_PATH.current" ]]; then
     if ! diff "$SPELL_PATH".current "$SPELL_PATH"; then
@@ -41,17 +43,26 @@ function cast_as() {
   USER_CANDALF_SPELLS_ROOT="$USER_CANDALF_ROOT/$SPELL_BOOK_NAME"
   CAST_ALWAYS="${CAST_ALWAYS:-""}"
   CAST_NEVER="${CAST_NEVER:-""}"
+  CANDALF_DRY_RUN="${CANDALF_DRY_RUN:-""}"
+
   cd "$CANDALF_ROOT"
   mkdir -p "$USER_CANDALF_ROOT/lib"
   rsync -ac lib/cast.sh lib/candalf-env.sh lib/colors.sh "$USER_CANDALF_ROOT/lib"
   rsync -Rac "$SPELL_BOOK_NAME/$SPELL_FILE" "$USER_CANDALF_ROOT"
-  chown -R "$CAST_USER":"$CAST_USER" "$USER_CANDALF_ROOT"
+  chown -R "$CAST_USER" "$USER_CANDALF_ROOT"
   cd - >/dev/null
 
   eval "$(candalfEnv)"
 
   # shellcheck disable=SC2154
-  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]}" CANDALF_ROOT="$USER_CANDALF_ROOT" CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" CAST_ALWAYS="$CAST_ALWAYS" CAST_NEVER="$CAST_NEVER" VERBOSE="$VERBOSE" HISTFILE=/dev/null \
+  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]}" \
+    CANDALF_ROOT="$USER_CANDALF_ROOT" \
+    CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" \
+    CAST_ALWAYS="$CAST_ALWAYS" \
+    CAST_NEVER="$CAST_NEVER" \
+    CANDALF_DRY_RUN="$CANDALF_DRY_RUN" \
+    VERBOSE="$VERBOSE" \
+    HISTFILE=/dev/null \
     bash -c ". $CANDALF_DIR_NAME/lib/cast.sh && cast $(printf "%q" "$SPELL_FILE")"
 }
 

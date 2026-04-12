@@ -13,6 +13,7 @@ install() {
     (command -v pacman >/dev/null && pacman -Sy --noconfirm "$PACKAGE") || \
     (command -v dnf >/dev/null && dnf install -y "$PACKAGE") || \
     (command -v yum >/dev/null && yum install -y "$PACKAGE") || \
+    (command -v brew >/dev/null && brew install "$PACKAGE") || \
     (echo "No supported package manager found, cannot continue!" && exit 1)
 }
 
@@ -20,6 +21,12 @@ mkdir -p "$HOME"/.candalf/lib
 mkdir -p /var/log
 touch /var/log/candalf.log
 chmod 640 /var/log/candalf.log
+
+if command -v brew >/dev/null && ! brew list --versions coreutils | grep -q .; then
+  brew install coreutils
+fi
+
 install rsync
 install bash
 install sudo
+

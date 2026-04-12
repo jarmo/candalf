@@ -36,6 +36,7 @@ manually in case of any problems.
   - CentOS
   - Fedora Linux
   - Alpine Linux
+  - macOS
   - Any other similar operating system
 * Adding support to a new Linux/Unix-like OS is quite easy thanks to [tests](test).
 
