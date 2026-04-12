@@ -8,7 +8,11 @@ CANDALF_REMOTE_ROOT=".candalf"
 SSH_OUTPUT_FLAG=$(test "$VERBOSE" && echo "-v" || echo "-q")
 
 CANDALF_SSH_CONFIG_PATH="${CANDALF_SSH_CONFIG_PATH:-""}"
+
 SSH_CONFIG_PATH=$(test "$CANDALF_SSH_CONFIG_PATH" && echo "$CANDALF_SSH_CONFIG_PATH" || echo "$HOME/.ssh/config")
+SSH_CONFIG_DIR="$(dirname "$SSH_CONFIG_PATH")"
+[[ ! -d "$SSH_CONFIG_DIR" ]] && mkdir -p "$SSH_CONFIG_DIR"
+
 SSH_CONFIG_FLAG=$(test "$CANDALF_SSH_CONFIG_PATH" && echo "-F $CANDALF_SSH_CONFIG_PATH" || echo "-F $SSH_CONFIG_PATH")
 
 # shellcheck source=lib/candalf-env.sh
