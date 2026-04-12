@@ -56,7 +56,6 @@ are needed. See more in [Installation](#installation) section.
 
 To use Candalf to cast spells to a **local** system, the following requirements need to be met:
 * System should be running a **supported** OS;
-  - On **macOS** [Homebrew](https://brew.sh) needs to be installed.
 
 
 ## Installation
