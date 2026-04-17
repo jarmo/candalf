@@ -56,26 +56,54 @@ are needed. See more in [Installation](#installation) section.
 
 To use Candalf to cast spells to a **local** system, the following requirements need to be met:
 * System should be running a **supported** OS;
+  - On **macOS** `coreutils` need to be installed
 
 
 ## Installation
 
-First, clone Candalf itself on your local system:
+1) First, clone Candalf itself on your local system:
 ```bash
 git clone https://github.com/jarmo/candalf.git
 ```
 
-Then create a symlink:
+2) On **macOS** install `coreutils` via [Homebrew](https://brew.sh):
 ```bash
-sudo ln -s "$(pwd -P)candalf/candalf.sh" /usr/local/bin/candalf
+brew install coreutils
 ```
 
-Create a separate project/directory for your spell scripts:
+3) Then create a symlink:
+```bash
+sudo ln -s "$(realpath candalf/candalf.sh)" /usr/local/bin/candalf
+```
+
+4) Execute `candalf` to see that the installation was successful:
+```bash
+$ candalf
+
+Usage: candalf [-v | --verbose] [-d | --dry-run] SERVER SPELL_BOOK...
+
+Options:
+  -d --dry-run   do not cast any spells, but show what would be casted
+  -v --verbose   enable verbose output
+  -n --no-color  disable colored output
+  -h --help      show this help
+
+Examples:
+  candalf example.org book.sh
+  candalf --verbose example.org book.sh
+
+  candalf localhost book.sh
+  candalf --dry-run localhost book.sh
+```
+
+## Getting Started Example
+
+1) Create a separate project/directory for your spell scripts:
 ```bash
 mkdir -p example/spells
 ```
 
-Create your first spell scripts:
+2) Create your first spell scripts:
 ```bash
 cd example
 
@@ -104,7 +132,7 @@ EOF
 chmod +x spells/whoami.sh
 ```
 
-Create a script for casting all the spells (so-called spell book):
+3) Create a script for casting all the spells (so-called spell book):
 ```bash
 cat << 'EOF' > example-book.sh
 #!/usr/bin/env bash
@@ -120,6 +148,17 @@ EOF
 
 chmod +x example-book.sh
 ```
+
+### Local system as a Target System
+
+Cast all the spells to the current system:
+```bash
+sudo -H candalf localhost example-book.sh
+```
+
+Note that `sudo` is required to cast spells onto localhost.
+
+### Remote Server as a Target System
 
 Cast all the spells to the server at example.org:
 ```bash
