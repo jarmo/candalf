@@ -9,7 +9,7 @@ systems to make them turn into what you want.
 Now that Candalf has gotten your attention we can talk more seriously.
 
 Candalf is a simple tool that helps to orchestrate Linux and Unix-like system
-configuration/setup/management using SSH.
+configuration/setup/management using simple shell-scripts and SSH.
 
 There are many tools that do a similar
 job (like [Ansible](https://www.ansible.com/), [Chef](https://www.chef.io/), [Puppet](https://puppet.com/) etc.) however
