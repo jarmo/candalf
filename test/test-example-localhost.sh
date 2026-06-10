@@ -16,11 +16,11 @@ test_example_localhost() {
   assert_logged "Casting.*completed"
   assert_not_logged "(Failed|Skipping)"
 
-  assert_file_exists "/root/today"
-  assert_not_empty "$(file_content "/root/today")"
+  assert_file_exists "/root/candalf-example-today"
+  assert_not_empty "$(file_content "/root/candalf-example-today")"
 
-  assert_file_content "/root/me" "root"
-  assert_file_content "/home/john/me" "john"
+  assert_file_content "/root/candalf-example-me" "root"
+  assert_file_content "/home/john/candalf-example-me" "john"
 
   assert_file_not_exists "/root/upgrade-done"
 }
