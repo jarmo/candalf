@@ -1,7 +1,7 @@
 all: test
 
 ALPINE_LINUX := generic/alpine319
-UBUNTU_LINUX := generic/ubuntu2204
+UBUNTU_LINUX := cloud-image/ubuntu-26.04
 FREEBSD      := generic/freebsd14
 ARCH_LINUX   := generic/arch
 CENTOS       := generic/centos9s
