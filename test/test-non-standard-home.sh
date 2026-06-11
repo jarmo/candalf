@@ -18,8 +18,8 @@ test_non_standard_home() {
 
   candalf candalf.test "$BOOK_PATH"
 
-  assert_file_contains "/root/candalf-example-me" "root"
-  assert_file_contains "/var/lib/john/candalf-example-me" "john"
+  assert_file_contains "/root/me" "root"
+  assert_file_contains "/var/lib/john/me" "john"
 }
 
 run_test "test_non_standard_home"

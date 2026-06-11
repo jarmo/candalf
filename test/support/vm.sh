@@ -37,7 +37,12 @@ vm_restore() {
 
 vm_exec() {
   CMD="${1:?"CMD is required!"}"
-  ssh -q -F "$TEST_DIR/support/ssh/config" candalf.test "${CMD}"
+  ssh -T -q -F "$TEST_DIR/support/ssh/config" candalf.test "${CMD}"
+}
+
+vm_exec_tty() {
+  CMD="${1:?"CMD is required!"}"
+  ssh -tt -q -F "$TEST_DIR/support/ssh/config" candalf.test "${CMD}"
 }
 
 vm_rsync() {
@@ -45,7 +50,12 @@ vm_rsync() {
 }
 
 vm_is_running() {
-  vm_box_same && nc -z candalf.test 2222
+  vm_box_same && \
+    ssh -T -q \
+    -o BatchMode=yes \
+    -o ConnectTimeout=2 \
+    -F "$TEST_DIR/support/ssh/config" \
+    candalf.test true
 }
 
 vm_box_same() {

@@ -2,7 +2,7 @@
 
 set -Eeuo pipefail
 
-VAGRANT_BOX="${VAGRANT_BOX:-"generic/ubuntu2110"}"
+VAGRANT_BOX="${VAGRANT_BOX:?"VAGRANT_BOX is required"}"
 
 TEST_DIR="${TEST_DIR:?"TEST_DIR is required!"}"
 TRAPS_SET="${TRAPS_SET:-""}"
@@ -27,7 +27,7 @@ candalf_local() {
   ARGS+=("${@}")
 
   vm_rsync
-  vm_exec "sudo -H $(printf "%q " "${ARGS[@]}") /candalf/candalf.sh localhost \"$BOOK_PATH\""
+  vm_exec_tty "sudo -H $(printf "%q " "${ARGS[@]}") /candalf/candalf.sh localhost \"$BOOK_PATH\""
 }
 
 before_each() {

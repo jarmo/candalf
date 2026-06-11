@@ -15,7 +15,7 @@ def prepare_ssh_for_wsl(ssh_config)
 end
 
 Vagrant.configure("2") do |config|
-  config.vm.box = ENV["VAGRANT_BOX"] || "generic/ubuntu2110"
+  config.vm.box = ENV["VAGRANT_BOX"] or raise("Missing VAGRANT_BOX environment variable")
   config.vm.box_check_update = false
   config.vm.synced_folder "../", "/candalf"
   config.vm.provision "shell", path: "support/bootstrap-vm.sh", env: {VERBOSE: ENV["VERBOSE"]}

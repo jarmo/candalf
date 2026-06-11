@@ -18,7 +18,7 @@ test_failing_spell_localhost() {
   candalf_local "/candalf/test/.test-book/$(basename "$BOOK_PATH")" || true
 
   assert_logged "Failed.*failing\.sh"
-  assert_not_logged "env\.sh"
+  assert_not_logged "spells/env\.sh"
 }
 
 test_failing_spell_for_user_localhost() {
@@ -29,7 +29,7 @@ test_failing_spell_for_user_localhost() {
   candalf candalf.test "$BOOK_PATH" || true
 
   assert_logged "Failed.*failing\.sh"
-  assert_not_logged "env\.sh"
+  assert_not_logged "spells/env\.sh"
 }
 
 run_test "test_failing_spell_localhost"
