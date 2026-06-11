@@ -31,8 +31,25 @@ vm_save() {
 }
 
 vm_restore() {
-  vm_is_running && \
-    ([[ "$KEEP_VM" = 1 ]] || vagrant snapshot restore --no-provision "$SNAPSHOT_NAME")
+  vm_is_running || return 1
+
+  [[ "$KEEP_VM" = 1 ]] && return 0
+
+  vagrant snapshot restore \
+      --no-provision \
+      --no-start \
+      "$SNAPSHOT_NAME" || return 1
+
+  # VirtualBox sometimes needs time to release the previous VM session.
+  sleep 2
+
+  local attempt
+  for attempt in 1 2 3; do
+      vagrant up --no-provision && return 0
+      sleep $((attempt * 2))
+  done
+
+  return 1
 }
 
 vm_exec() {
