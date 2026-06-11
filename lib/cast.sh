@@ -54,8 +54,16 @@ function cast_as() {
 
   eval "$(candalfEnv)"
 
+  local SUDO_CMD=sudo
+
+  if command -v sudo.ws >/dev/null 2>&1; then
+    case "$(sudo --version 2>/dev/null)" in
+      sudo-rs*) SUDO_CMD=sudo.ws ;;
+    esac
+  fi
+
   # shellcheck disable=SC2154
-  sudo -iHu "$CAST_USER" env "${candalfEnvVars[@]}" \
+  "$SUDO_CMD" -iHu "$CAST_USER" env "${candalfEnvVars[@]}" \
     CANDALF_ROOT="$USER_CANDALF_ROOT" \
     CANDALF_SPELLS_ROOT="$USER_CANDALF_SPELLS_ROOT" \
     CAST_ALWAYS="$CAST_ALWAYS" \
