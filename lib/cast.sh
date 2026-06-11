@@ -79,7 +79,7 @@ function _cast() {
     else
       log "Spell was NOT cast due to ${COLOR_YELLOW_BG}CAST_NEVER=1${COLOR_END} attribute"
     fi
-    cp "$SPELL_PATH" "$SPELL_PATH".current
+    command cp "$SPELL_PATH" "$SPELL_PATH".current
   else
     echo
     log "Spell was NOT cast due to ${COLOR_YELLOW_BG}dry-run${COLOR_END} mode being enabled"

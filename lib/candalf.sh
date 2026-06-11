@@ -33,7 +33,8 @@ candalf() {
 
   cd "$SPELL_BOOK_DIR"
   rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
-    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" root@"$CANDALF_SERVER":"$(printf "%q" "$CANDALF_SPELLS_ROOT")"
+    -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" \
+    "root@$CANDALF_SERVER:$CANDALF_SPELLS_ROOT"
   cd - >/dev/null
 
   # shellcheck disable=SC2086
@@ -113,7 +114,8 @@ bootstrap() {
     SSH_SERVER_PORT=$(grep -A 10 "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH" | grep "Port" | head -1 | cut -d " " -f4)
   fi    
 
-  if ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT" 2>/dev/null; then
+  if ! grep --quiet "Host $CANDALF_SERVER" "$SSH_CONFIG_PATH" &&
+     ! nc -z "$CANDALF_SERVER" "$SSH_SERVER_PORT" 2>/dev/null; then
     # shellcheck disable=SC2029,SC2086
     ssh "$SSH_OUTPUT_FLAG" $SSH_CONFIG_FLAG \
       -o PubkeyAuthentication=yes \
