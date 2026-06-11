@@ -657,17 +657,15 @@ following command:
 $ make test-one TEST=test/test-example.sh
 ```
 
-To execute a single test against an Ubuntu Linux VM:
+To execute a single test against a pre-defined VM:
 ```
-$ test/test-[NAME].sh
+$ make test-ubuntu TEST=test/test-[NAME].sh
 ```
 
-To execute a single test against FreeBSD VM:
+To execute a single test against some not pre-defined VM, use `VAGRANT_BOX` variable:
 ```
 $ VAGRANT_BOX="generic/freebsd13" test/test-[NAME].sh
 ```
-
-Use any other `VAGRANT_BOX` environment value to run tests against that VM.
 
 Tests have been run on Ubuntu Linux and might not work from anywhere else.
 
