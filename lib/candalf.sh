@@ -32,7 +32,7 @@ candalf() {
     -e "ssh -q $SSH_CONFIG_FLAG" root@"$CANDALF_SERVER":$CANDALF_REMOTE_ROOT/lib
 
   cd "$SPELL_BOOK_DIR"
-  rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -Rac "." \
+  rsync "$SSH_OUTPUT_FLAG" --exclude ".**" -sRac "." \
     -e "ssh $SSH_OUTPUT_FLAG $SSH_CONFIG_FLAG" \
     "root@$CANDALF_SERVER:$CANDALF_SPELLS_ROOT"
   cd - >/dev/null
